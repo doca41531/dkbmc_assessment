@@ -1,0 +1,410 @@
+<!--
+/**
+ * @description       : Assessment Template Component with Question Score Setting - DKEDU
+ * @author            : developer@company.com
+ * @group             : DKEDU Components  
+ * @created date      : 2025-01-15
+ * @last modified on  : 2025-10-15
+ * @last modified by  : mingyu.park@dkbmc.com
+ * @version           : 1.2.0
+ */
+-->
+<template>
+    <!-- Modal Section -->
+    <div key={renderKey}>
+        <section class="slds-modal slds-fade-in-open slds-modal_small" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true">
+            <div class="slds-modal__container">
+                <!-- Modal Header -->
+                <header class="slds-modal__header">
+                    <button type="button" title="Cancel and close" class="slds-button slds-button_icon slds-modal__close slds-button_icon-bare" onclick={handleCancel}>
+                        <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-button__icon slds-button__icon_large">
+                            <g>
+                                <path d="M310 254l130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 01-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0114 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 010-14z"></path>
+                            </g>
+                        </svg>
+                        <span class="slds-assistive-text">Cancel and close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <template if:true={isStep1}>New Assessment Template</template>
+                        <template if:true={isStep2}>Set Question Scores - {currentSessionName}</template>
+                    </h2>
+                </header>
+
+                <!-- Modal Body -->
+                <div class="slds-modal__content slds-p-around_medium">
+                    <!-- Required Field Indicator -->
+                    <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+                        <div></div>
+                        <div class="slds-text-align_right">
+                            <span style="color: #c23934; font-size: 13px; font-weight: bold;">*</span>
+                            <span class="slds-m-left_xx-small slds-text-body_small">= Required Information</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Template Information & Question Selection -->
+                    <template if:true={isStep1}>
+                        <section class="slds-m-bottom_medium">
+                            <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
+                                Information
+                            </h3>
+                            
+                            <div class="slds-p-horizontal_small slds-p-top_small">
+                                <!-- Template Name -->
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label" for="templateName">
+                                        <abbr class="slds-required" title="required" style="color: #c23934;">*</abbr>
+                                        Template Name
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <input type="text" 
+                                               class="slds-input" 
+                                               id="templateName"
+                                               value={templateName}
+                                               placeholder="Enter template name"
+                                               onchange={handleTemplateNameChange} />
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <label class="slds-form-element__label" for="description">
+                                        Description
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <lightning-textarea
+                                                name="description"
+                                                label=""
+                                                placeholder="Enter description"
+                                                value={description}
+                                                onchange={handleDescriptionChange}
+                                                max-length="255">
+                                        </lightning-textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Checkboxes Grid - IsActive -->
+                                <div class="checkbox-grid">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-checkbox">
+                                                <input type="checkbox" id="isActive" checked={isActive} onchange={handleCheckboxChange} />
+                                                <label class="slds-checkbox__label" for="isActive">
+                                                    <span class="slds-checkbox_faux"></span>
+                                                    <span class="slds-form-element__label">Is Active</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sessions Container -->
+                                <template for:each={sessions} for:item="session">
+                                    <div key={session.id} class="session-container">
+                                        <div class="session-header">
+                                            <div class="session-name-container">
+                                                <div class="slds-form-element session-name-input">
+                                                    <label class="slds-form-element__label" for={session.nameInputId}>
+                                                        <abbr class="slds-required" title="required" style="color: #c23934;">*</abbr>
+                                                        Session Name
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" class="slds-input" 
+                                                               id={session.nameInputId}
+                                                               placeholder="Enter session name"
+                                                               value={session.name}
+                                                               data-session-id={session.id}
+                                                               onchange={handleSessionNameChange} />
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Session Score Input -->
+                                                <div class="slds-form-element session-score-input">
+                                                    <label class="slds-form-element__label" for={session.scoreInputId}>
+                                                        <abbr class="slds-required" title="required" style="color: #c23934;">*</abbr>
+                                                        Session Score
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="number" 
+                                                               class="slds-input" 
+                                                               id={session.scoreInputId}
+                                                               placeholder="Enter score"
+                                                               value={session.score}
+                                                               data-session-id={session.id}
+                                                               onchange={handleSessionScoreChange}
+                                                               min="0"
+                                                               step="0.01"
+                                                               required />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="session-actions">
+                                                    <button type="button" 
+                                                            class="slds-button slds-button_destructive slds-button_outline" 
+                                                            data-session-id={session.id}
+                                                            onclick={removeSession} 
+                                                            title="Delete Session"
+                                                            disabled={isSingleSession}>
+                                                        <lightning-icon icon-name="utility:delete" size="x-small" class="slds-button__icon slds-button__icon_left"></lightning-icon>
+                                                        Delete Session
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="dual-listbox-container">
+                                            <!-- Left List (Available Questions) -->
+                                            <div class="listbox-section">
+                                                <div class="listbox-header">Available Questions</div>
+                                                <div class="search-container">
+                                                    <div class="slds-form-element__control">
+                                                        <input type="text" class="slds-input" placeholder="Search questions..." 
+                                                               data-session-id={session.id}
+                                                               oninput={handleSearch} />
+                                                    </div>
+                                                </div>
+                                                <div class="listbox" data-list-type="available" data-session-id={session.id} onclick={handleListboxClick}>
+                                                    <template for:each={session.filteredAvailableQuestions} for:item="question">
+                                                        <div key={question.id} 
+                                                             class={question.cssClass} 
+                                                             data-id={question.id}>
+                                                            {question.text} ({question.type})
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Transfer Buttons -->
+                                            <div class="transfer-buttons">
+                                                <button class="slds-button slds-button_icon slds-button_icon-container arrow-btn" 
+                                                        data-session-id={session.id} 
+                                                        onclick={moveToSelected} 
+                                                        title="Move to Selected">
+                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="icon-color slds-icon slds-icon_x-small"><g><path d="M140 437V83c0-10 13-17 22-9l212 173c8 6 8 19 0 25L162 447c-9 7-22 1-22-10z"></path></g></svg>
+                                                    <span class="slds-assistive-text">Move to Selected</span>
+                                                </button>
+                                                <button class="slds-button slds-button_icon slds-button_icon-container arrow-btn" 
+                                                        data-session-id={session.id} 
+                                                        onclick={moveToAvailable} 
+                                                        title="Move to Available">
+                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="icon-color slds-icon slds-icon_x-small"><g><path d="M380 83v354c0 10-13 17-22 9L146 273c-8-6-8-19 0-25L358 73c9-7 22-1 22 10z"></path></g></svg>
+                                                    <span class="slds-assistive-text">Move to Available</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Right List (Selected Questions) -->
+                                            <div class="listbox-section">
+                                                <div class="listbox-header">Selected Questions</div>
+                                                <div class="listbox" data-list-type="selected" data-session-id={session.id} onclick={handleListboxClick}>
+                                                    <template for:each={session.selectedQuestions} for:item="question">
+                                                        <div key={question.id} 
+                                                             class={question.cssClass} 
+                                                             data-id={question.id}>
+                                                            {question.text} ({question.type})
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Order Control Buttons -->
+                                            <div class="order-buttons">
+                                                <button class="slds-button slds-button_icon slds-button_icon-container arrow-btn" 
+                                                        data-session-id={session.id} 
+                                                        onclick={moveUp} 
+                                                        title="Move Up">
+                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="icon-color slds-icon slds-icon_x-small"><g><path d="M437 380H83c-10 0-17-13-9-22l173-212c6-8 19-8 25 0l175 212c7 9 1 22-10 22z"></path></g></svg>
+                                                    <span class="slds-assistive-text">Move Up</span>
+                                                </button>
+                                                <button class="slds-button slds-button_icon slds-button_icon-container arrow-btn" 
+                                                        data-session-id={session.id} 
+                                                        onclick={moveDown} 
+                                                        title="Move Down">
+                                                    <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="icon-color slds-icon slds-icon_x-small"><g><path d="M83 140h354c10 0 17 13 9 22L273 374c-6 8-19 8-25 0L73 162c-7-9-1-22 10-22z"></path></g></svg>
+                                                    <span class="slds-assistive-text">Move Down</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Add Session Button -->
+                                <div class="slds-m-top_large">
+                                    <button type="button" class="slds-button slds-button_brand add-session-btn" onclick={addSession}>
+                                        <lightning-icon icon-name="utility:add" size="x-small" class="slds-button__icon slds-button__icon_left"></lightning-icon>
+                                        Add Session
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+                    </template>
+
+                    <!-- Step 2: Question Score Setting -->
+                    <template if:true={isStep2}>
+                        <section class="slds-m-bottom_medium">
+                            <!-- Session Progress -->
+                            <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium">
+                                <h3 class="slds-text-heading_small slds-p-around_small" style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
+                                    Session: {currentSessionName}
+                                </h3>
+                                <div class="slds-text-body_small">
+                                    Session {sessionProgress}
+                                </div>
+                            </div>
+
+                            <!-- Score Summary -->
+                            <div class="slds-box slds-m-bottom_medium">
+                                <div class="slds-grid slds-grid_align-spread">
+                                    <div>
+                                        <strong>Session Score: {totalSessionScore}</strong>
+                                    </div>
+                                    <div>
+                                        <strong>Questions Total: {currentQuestionsTotalScore}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Questions List -->
+                            <div class="question-scores-container">
+                                <template for:each={currentSessionQuestions} for:item="question">
+                                    <div key={question.id} class="question-score-item slds-box slds-m-bottom_medium">
+                                        <!-- Question Header -->
+                                        <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+                                            <div class="slds-col slds-size_3-of-4">
+                                                <h4 class="slds-text-heading_small">{question.text}</h4>
+                                                <p class="slds-text-body_small slds-text-color_weak">Type: {question.type}</p>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-4">
+                                                <div class="slds-form-element">
+                                                    <label class="slds-form-element__label">
+                                                        <abbr class="slds-required" title="required" style="color: #c23934;">*</abbr>
+                                                        Question Score
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <input type="number" 
+                                                               class="slds-input" 
+                                                               placeholder="0"
+                                                               value={question.score}
+                                                               data-question-id={question.id}
+                                                               onchange={handleQuestionScoreChange}
+                                                               min="0"
+                                                               step="0.01"
+                                                               required />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Multiple Choice Items (if applicable) -->
+                                        <template if:true={question.isMultipleChoice}>
+                                            <div class="question-items-container slds-m-top_medium">
+                                                <h5 class="slds-text-heading_x-small slds-m-bottom_small">Answer Choices</h5>
+                                                <template for:each={question.questionItems} for:item="item">
+                                                    <div key={item.id} class="slds-grid slds-grid_align-spread slds-m-bottom_x-small slds-p-vertical_xx-small">
+                                                        <div class="slds-col slds-size_3-of-4">
+                                                            <span class="slds-text-body_small">{item.content}</span>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-4">
+                                                            <div class="slds-form-element">
+                                                                <label class="slds-form-element__label slds-assistive-text">
+                                                                    Score for {item.content}
+                                                                </label>
+                                                                <div class="slds-form-element__control">
+                                                                    <input type="number" 
+                                                                           class="slds-input slds-input_small" 
+                                                                           placeholder="0"
+                                                                           value={item.score}
+                                                                           data-question-id={question.id}
+                                                                           data-item-id={item.id}
+                                                                           onchange={handleQuestionItemScoreChange}
+                                                                           min="0"
+                                                                           step="0.01" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Session Navigation -->
+                            <div class="slds-grid slds-grid_align-center slds-m-top_large">
+                                <button type="button" 
+                                        class="slds-button slds-button_neutral slds-m-right_small" 
+                                        onclick={handlePreviousSession}
+                                        disabled={currentSessionIndex}>
+                                    <lightning-icon icon-name="utility:chevronleft" size="x-small" class="slds-button__icon slds-button__icon_left"></lightning-icon>
+                                    Previous Session
+                                </button>
+                                
+                                <button type="button" 
+                                        class="slds-button slds-button_neutral" 
+                                        onclick={handleNextSession}
+                                        disabled={isLastSession}>
+                                    Next Session
+                                    <lightning-icon icon-name="utility:chevronright" size="x-small" class="slds-button__icon slds-button__icon_right"></lightning-icon>
+                                </button>
+                            </div>
+                        </section>
+                    </template>
+                </div>
+
+                <!-- Modal Footer -->
+                <footer class="slds-modal__footer">
+                    <!-- Step 1 Footer -->
+                    <template if:true={isStep1}>
+                        <button class="slds-button slds-button_neutral" onclick={handleCancel}>
+                            Cancel
+                        </button>
+                        <button class="slds-button slds-button_brand" onclick={handleNext} disabled={isLoading}>
+                            <template if:true={isLoading}>
+                                <span class="slds-spinner_container slds-spinner_inline">
+                                    <div role="status" class="slds-spinner slds-spinner_xx-small slds-spinner_inline">
+                                        <span class="slds-assistive-text">Loading</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </span>
+                            </template>
+                            Next
+                        </button>
+                    </template>
+
+                    <!-- Step 2 Footer -->
+                    <template if:true={isStep2}>
+                        <button class="slds-button slds-button_neutral" onclick={handlePrevious}>
+                            <lightning-icon icon-name="utility:chevronleft" size="x-small" class="slds-button__icon slds-button__icon_left"></lightning-icon>
+                            Previous
+                        </button>
+                        <button class="slds-button slds-button_neutral" onclick={handleSaveAndNew} disabled={isLoading}>
+                            <template if:true={isLoading}>
+                                <span class="slds-spinner_container slds-spinner_inline">
+                                    <div role="status" class="slds-spinner slds-spinner_xx-small slds-spinner_inline">
+                                        <span class="slds-assistive-text">Loading</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </span>
+                            </template>
+                            Save & New
+                        </button>
+                        <button class="slds-button slds-button_brand" onclick={handleSave} disabled={isLoading}>
+                            <template if:true={isLoading}>
+                                <span class="slds-spinner_container slds-spinner_inline">
+                                    <div role="status" class="slds-spinner slds-spinner_xx-small slds-spinner_inline">
+                                        <span class="slds-assistive-text">Loading</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </span>
+                            </template>
+                            Save
+                        </button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</template>

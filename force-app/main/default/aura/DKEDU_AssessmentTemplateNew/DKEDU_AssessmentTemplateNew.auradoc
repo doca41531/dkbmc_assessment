@@ -1,0 +1,10 @@
+<aura:documentation>
+    <aura:description>
+        Aura wrapper component to override standard New button for Assessment Templates.
+        This component provides a custom interface for creating assessment templates
+        using the dkedu_assessmentTemplate LWC component.
+    </aura:description>
+    <aura:example name="DKEDU_AssessmentTemplateNew" ref="c:DKEDU_AssessmentTemplateNew" label="Assessment Template New Override">
+        Example implementation of custom assessment template creation form.
+    </aura:example>
+</aura:documentation>

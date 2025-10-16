@@ -1,0 +1,10 @@
+<aura:documentation>
+    <aura:description>
+        Aura wrapper component to override standard New button for Assessment Questions.
+        This component provides a custom interface for creating assessment questions
+        using the dkedu_assessmentQuestionRecord LWC component.
+    </aura:description>
+    <aura:example name="DKEDU_AssessmentQuestionNew" ref="c:DKEDU_AssessmentQuestionNew" label="Assessment Question New Override">
+        Example implementation of custom assessment question creation form.
+    </aura:example>
+</aura:documentation>

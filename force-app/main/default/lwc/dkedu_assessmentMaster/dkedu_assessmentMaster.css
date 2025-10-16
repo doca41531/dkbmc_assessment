@@ -1,0 +1,559 @@
+/* Assessment Master Modal Component - DKEDU Styling (Updated) */
+
+/* Form element base styling with improved state management */
+.slds-form-element {
+    padding-left: 1rem;
+    padding-right: 1.75rem;
+    margin-bottom: 1rem;
+    overflow: visible;
+    position: relative;
+}
+
+@media (max-width: 600px) {
+    .slds-form-element {
+        padding-left: 0.75rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* Input field styling with focus states */
+.slds-input,
+.slds-textarea,
+.slds-select {
+    box-sizing: border-box;
+    border: 1px solid var(--slds-c-input-color-border, #c9c9c9);
+    border-radius: var(--slds-c-input-radius-border, 0.25rem);
+    background: var(--slds-c-input-color-background, #fff);
+    min-height: 2.25rem;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.slds-input:focus,
+.slds-textarea:focus,
+.slds-select:focus {
+    border-color: var(--slds-c-input-color-border-focus, #1589ee);
+    box-shadow: 0 0 0 2px rgba(1, 118, 211, 0.15);
+    outline: none;
+}
+
+/* Prevent data loss during state changes */
+.slds-input[data-field],
+.slds-textarea[data-field] {
+    transition: all 0.2s ease;
+}
+
+.slds-input[data-field]:valid {
+    border-color: #02844a;
+}
+
+.slds-input[data-field]:invalid {
+    border-color: #c23934;
+}
+
+/* Modal content scrolling */
+.slds-modal{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slds-modal__container {
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+}
+
+.slds-modal__content {
+    overflow-y: auto;
+    overflow-x: visible;
+    max-height: 70vh;
+}
+
+.slds-modal__content section {
+    overflow: visible;
+}
+
+/* Required field styling */
+.slds-required {
+    color: var(--slds-c-form-element-error-color-text, #c23934);
+}
+
+/* Section styling to match Assessment Template */
+.slds-text-heading_small.slds-theme_shade {
+    background: var(--slds-g-color-neutral-base-95, #f3f2f2);
+    border: 1px solid var(--slds-c-card-color-border, #d8dde6);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    color: #181818;
+    font-weight: 600;
+}
+
+/* Custom dropdown styling with improved state management */
+.slds-combobox[aria-expanded="true"] .slds-dropdown {
+    display: block;
+    border: 1px solid var(--slds-c-input-color-border-focus, #1589ee);
+    border-top: none;
+    border-radius: 0 0 var(--slds-c-input-radius-border, 0.25rem) var(--slds-c-input-radius-border, 0.25rem);
+    box-shadow: var(--slds-c-popover-drop-shadow, 0 2px 3px 0 rgba(0, 0, 0, 0.16));
+    background: var(--slds-c-input-color-background, white);
+    z-index: 9001;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.slds-combobox[aria-expanded="false"] .slds-dropdown {
+    display: none;
+}
+
+/* Input field border when dropdown is open */
+.slds-combobox[aria-expanded="true"] .slds-combobox__input {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    border-color: var(--slds-c-input-color-border-focus, #1589ee);
+}
+
+/* Dropdown list items hover effect */
+.slds-dropdown .slds-listbox__option:hover {
+    background-color: var(--slds-c-listbox-item-color-background-hover, #f3f2f2);
+    cursor: pointer;
+}
+
+/* Dropdown list items active state */
+.slds-dropdown .slds-listbox__option:active {
+    background-color: var(--slds-c-listbox-item-color-background-active, #0176d3);
+    color: var(--slds-c-listbox-item-color-text-active, white);
+}
+
+/* Ensure combobox containers don't clip */
+.slds-combobox_container {
+    position: relative;
+    overflow: visible;
+}
+
+.slds-combobox {
+    position: relative;
+    overflow: visible;
+}
+
+/* Search Results Styling */
+.search-results-container {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background: white;
+}
+
+.contact-result-item {
+    border: 1px solid #e5e5e5;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    transition: box-shadow 0.2s;
+}
+
+.contact-result-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #0176d3;
+}
+
+/* Selected Targets Styling */
+.selected-targets-container {
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    border: 1px solid #e5e5e5;
+}
+
+.selected-targets-container .slds-card {
+    border: 1px solid #d8dde6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.selected-targets-container .slds-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Contact name styling improvements */
+.selected-targets-container .slds-card__body {
+    padding: 0.75rem;
+    min-height: auto;
+}
+
+.selected-targets-container strong {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #181818 !important;
+    line-height: 1.4 !important;
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+/* Prevent text wrapping and breaking */
+.selected-targets-container .slds-has-flexi-truncate {
+    min-width: 0 !important;
+    flex: 1 !important;
+    word-break: keep-all !important;
+    overflow: hidden !important;
+}
+
+.selected-targets-container .slds-truncate {
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Email and account text styling */
+.selected-targets-container .slds-text-body_small {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+    margin-top: 0.25rem !important;
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Ensure proper grid alignment */
+.selected-targets-container .slds-grid {
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+}
+
+/* Button positioning */
+.selected-targets-container .slds-col.slds-no-flex {
+    flex-shrink: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+/* Card width management */
+.selected-targets-container .slds-col {
+    min-width: 0 !important;
+}
+
+/* Additional Korean text support */
+.selected-targets-container * {
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+}
+
+/* Responsive adjustments for target cards */
+@media (max-width: 768px) {
+    .selected-targets-container .slds-col.slds-large-size_1-of-3 {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    
+    .selected-targets-container .slds-card__body {
+        padding: 1rem !important;
+    }
+}
+
+/* Button Styling */
+.slds-button_brand {
+    background: #0176d3;
+    border-color: #0176d3;
+}
+
+.slds-button_brand:hover:not(:disabled) {
+    background: #014486;
+    border-color: #014486;
+}
+
+.slds-button_neutral {
+    background: white;
+    border-color: #d8dde6;
+    color: #0176d3;
+}
+
+.slds-button_neutral:hover:not(:disabled) {
+    background: #f3f2f2;
+    border-color: #0176d3;
+}
+
+/* Loading state */
+.slds-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Search icon styling */
+.slds-input-has-icon .slds-input__icon {
+    fill: #706e6b;
+    pointer-events: none;
+}
+
+/* Target cards layout */
+.selected-targets-container .slds-grid {
+    margin-bottom: 0.5rem;
+}
+
+.selected-targets-container .slds-card__body {
+    padding: 0.75rem;
+}
+
+/* Help text styling */
+.slds-form-element__help {
+    color: #706e6b;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Footer styling */
+.slds-modal__footer {
+    border-radius: 0;
+}
+
+/* Text sizing */
+.slds-text-body_small {
+    font-size: 13px;
+}
+
+/* Loading state styling */
+.slds-spinner_container.slds-spinner_inline {
+    margin-right: 0.5rem;
+}
+
+/* Checkbox styling with improved state handling */
+.slds-checkbox {
+    display: inline-flex;
+    align-items: center;
+}
+
+.slds-checkbox_faux {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid #d8dde6;
+    border-radius: 0.125rem;
+    background: white;
+    position: relative;
+    margin-right: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.slds-checkbox input[data-field]:checked + .slds-checkbox__label .slds-checkbox_faux {
+    background: #0176d3;
+    border-color: #0176d3;
+}
+
+.slds-checkbox input[data-field]:checked + .slds-checkbox__label .slds-checkbox_faux::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Date input styling with state preservation */
+input[type="date"][data-field] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    position: relative;
+}
+
+input[type="date"][data-field]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.5);
+    position: absolute;
+    right: 0.5rem;
+}
+
+/* Textarea styling with improved data retention */
+lightning-textarea[data-field] {
+    display: block;
+    width: 100%;
+}
+
+/* Form state indicators */
+.form-field-dirty {
+    border-left: 3px solid #1589ee;
+    padding-left: 0.5rem;
+}
+
+.form-field-error {
+    border-left: 3px solid #c23934;
+    padding-left: 0.5rem;
+}
+
+.form-field-success {
+    border-left: 3px solid #02844a;
+    padding-left: 0.5rem;
+}
+
+/* Success state styling */
+.slds-text-color_success {
+    color: #02844a;
+    font-weight: 600;
+}
+
+/* Error state styling */
+.slds-has-error .slds-input,
+.slds-has-error .slds-select {
+    border-color: #c23934;
+    box-shadow: inset 0 0 0 1px #c23934;
+}
+
+/* Animation for smooth interactions */
+.contact-result-item,
+.selected-targets-container .slds-card {
+    transition: all 0.2s ease;
+}
+
+/* Focus states for accessibility */
+.slds-button:focus {
+    outline: 2px solid #1589ee;
+    outline-offset: 2px;
+}
+
+.contact-result-item:focus-within {
+    border-color: #0176d3;
+    box-shadow: 0 0 0 2px rgba(1, 118, 211, 0.15);
+}
+
+/* Data persistence visual feedback */
+.slds-form-element[data-has-value="true"] .slds-form-element__label {
+    color: #0176d3;
+    font-weight: 600;
+}
+
+.slds-form-element[data-required="true"][data-has-value="false"] .slds-form-element__label {
+    color: #c23934;
+}
+
+/* Visual feedback for form state */
+.form-saving .slds-input,
+.form-saving .slds-select,
+.form-saving lightning-textarea {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    .slds-col.slds-medium-size_1-of-2 {
+        width: 100%;
+    }
+    
+    .selected-targets-container .slds-col.slds-large-size_1-of-3 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .slds-form-element {
+        padding-left: 0.5rem;
+        padding-right: 1rem;
+    }
+    
+    .slds-modal__footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .slds-modal__footer button {
+        width: 100%;
+    }
+    
+    .selected-targets-container .slds-col {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .slds-input,
+    .slds-select {
+        border-width: 2px;
+    }
+    
+    .slds-button_brand {
+        border-width: 2px;
+    }
+    
+    .contact-result-item {
+        border-width: 2px;
+    }
+    
+    .slds-text-color_success {
+        color: #000;
+        background: #00ff00;
+        padding: 0.25rem;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .contact-result-item,
+    .selected-targets-container .slds-card,
+    .slds-input,
+    .slds-select,
+    .slds-checkbox_faux {
+        transition: none;
+    }
+}
+
+/* Focus states for inputs */
+.slds-input:focus,
+.slds-select:focus {
+    outline: 2px solid var(--slds-c-input-color-border-focus);
+    outline-offset: -2px;
+}
+
+/* Ensure proper spacing in grid layout */
+.slds-grid.slds-gutters .slds-col {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Form element margin adjustments */
+.slds-form-element.slds-m-bottom_medium {
+    margin-bottom: 1rem;
+}
+
+/* Animation for modal appearance */
+.slds-modal.slds-fade-in-open {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Data retention helper classes */
+.persist-data .slds-input,
+.persist-data .slds-select,
+.persist-data lightning-textarea {
+    background-color: #f8f9fa;
+    border-color: #0176d3;
+}
+
+.data-modified {
+    position: relative;
+}
+
+.data-modified::after {
+    content: '●';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    color: #1589ee;
+    font-size: 0.75rem;
+}
