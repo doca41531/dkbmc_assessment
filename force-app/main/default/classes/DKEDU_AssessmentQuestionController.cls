@@ -1,14 +1,14 @@
 /**
- * @description       : Assessment Question Controller - DKEDU
- * @author            : mingyu.park@dkbmc.com
- * @group             : DKEDU Controllers
- * @created date      : 2025-09-25
- * @last modified on  : 2025-10-14
- * @last modified by  : mingyu.park@dkbmc.com
- * @version           : 1.1.0
- * @description       : Controller class for Assessment Question operations
- *                      including creation, retrieval, and item management
- *                      following DK Lab development standards with standardized logging and error handling
+ * @description Assessment Question Controller - DKEDU (DK Lab Standards Applied)
+ * @author mingyu.park@dkbmc.com
+ * @group DKEDU Controllers  
+ * @created date 2025-09-25
+ * @last modified on 2025-10-17
+ * @last modified by mingyu.park@dkbmc.com
+ * @version 1.2.0
+ * @description Controller class for Assessment Question operations
+ *              including creation, retrieval, and item management
+ *              following DK Lab development standards with standardized logging and error handling
  */
 public with sharing class DKEDU_AssessmentQuestionController {
     
@@ -25,22 +25,26 @@ public with sharing class DKEDU_AssessmentQuestionController {
     /**
      * @description Debug logging utility method
      * @param {String} methodName - Name of the method calling log
-     * @param {String} msg - Message to log
+     * @param {String} message - Message to log
      * @param {Object} variable - Variable to log (optional)
      */
-    private static void log(String methodName, String msg, Object variable) {
+    private static void log(String methodName, String message, Object variable) {
         if (DEBUG) {
-            String logMessage = 'DKEDU_AssessmentQuestionController ' + methodName + ' ' + msg + ' ==>';
-            if (variable != null) {
-                System.debug(logMessage + ' ' + String.valueOf(variable));
-            } else {
-                System.debug(logMessage);
+            try {
+                String logMessage = 'DKEDU_AssessmentQuestionController ' + methodName + ' ' + message + ' ==>';
+                if (variable != null) {
+                    System.debug(logMessage + ' ' + JSON.serialize(variable));
+                } else {
+                    System.debug(logMessage);
+                }
+            } catch (Exception e) {
+                System.debug('DKEDU_AssessmentQuestionController ' + methodName + ' [Logging Error: ' + e.getMessage() + ']');
             }
         }
     }
     
     // ========================================
-    // WEBSERVICE METHODS
+    // WEBSERVICE METHODS  
     // ========================================
     
     /**
@@ -50,12 +54,12 @@ public with sharing class DKEDU_AssessmentQuestionController {
      */
     @AuraEnabled
     public static String createAssessmentQuestion(String questionData) {
-        log('createAssessmentQuestion', '메서드 시작', questionData);
+        log('createAssessmentQuestion', 'Method started', questionData);
         
         try {
-            log('createAssessmentQuestion', '데이터 파싱 시작', '');
+            log('createAssessmentQuestion', 'Starting data parsing', '');
             Map<String, Object> data = (Map<String, Object>) JSON.deserializeUntyped(questionData);
-            log('createAssessmentQuestion', '파싱 완료', data);
+            log('createAssessmentQuestion', 'Parsing completed', data);
             
             // Extract Assessment Question fields
             String questionType = (String) data.get('questionType');
@@ -65,7 +69,7 @@ public with sharing class DKEDU_AssessmentQuestionController {
             String relatedCriteria = (String) data.get('relatedCriteria');
             Boolean fileIncluded = (Boolean) data.get('fileIncluded');
             
-            log('createAssessmentQuestion', '필드 추출 완료', new Map<String, Object>{
+            log('createAssessmentQuestion', 'Field extraction completed', new Map<String, Object>{
                 'questionType' => questionType,
                 'questionText' => questionText,
                 'hasRelatedQuestion' => hasRelatedQuestion
@@ -83,12 +87,12 @@ public with sharing class DKEDU_AssessmentQuestionController {
             if (hasRelatedQuestion && String.isNotBlank(relatedQuestionId)) {
                 assessmentQuestion.RelatedQuestionId__c = relatedQuestionId;
                 assessmentQuestion.RelatedCriteria__c = relatedCriteria;
-                log('createAssessmentQuestion', '관련 질문 설정', relatedQuestionId);
+                log('createAssessmentQuestion', 'Related question configured', relatedQuestionId);
             }
             
-            log('createAssessmentQuestion', 'Assessment Question 삽입 시작', assessmentQuestion);
+            log('createAssessmentQuestion', 'Starting Assessment Question insert', assessmentQuestion);
             insert assessmentQuestion;
-            log('createAssessmentQuestion', '삽입 완료', assessmentQuestion.Id);
+            log('createAssessmentQuestion', 'Insert completed', assessmentQuestion.Id);
             
             // Verify question was created successfully
             List<AssessmentQuestion__c> verifyQuestion = [
@@ -99,21 +103,21 @@ public with sharing class DKEDU_AssessmentQuestionController {
             ];
             
             if (verifyQuestion.isEmpty()) {
-                log('createAssessmentQuestion', '검증 실패 - 질문이 생성되지 않음', '');
+                log('createAssessmentQuestion', 'Verification failed - question not created', '');
                 return JSON.serialize(new Map<String, Object>{
                     'success' => false,
                     'message' => 'Question insert failed - record not found after creation'
                 });
             }
             
-            log('createAssessmentQuestion', '질문 검증 성공', verifyQuestion[0]);
+            log('createAssessmentQuestion', 'Question verification successful', verifyQuestion[0]);
             
             // Create Assessment Question Items (choices) if they exist
             List<Object> choiceItems = (List<Object>) data.get('choices');
             Integer itemsCreated = 0;
             
             if (choiceItems != null && !choiceItems.isEmpty()) {
-                log('createAssessmentQuestion', '선택지 생성 시작', choiceItems.size());
+                log('createAssessmentQuestion', 'Starting choice creation', choiceItems.size());
                 List<AssessmentQuestionItem__c> questionItems = new List<AssessmentQuestionItem__c>();
                 
                 for (Integer i = 0; i < choiceItems.size(); i++) {
@@ -132,7 +136,7 @@ public with sharing class DKEDU_AssessmentQuestionController {
                 if (!questionItems.isEmpty()) {
                     insert questionItems;
                     itemsCreated = questionItems.size();
-                    log('createAssessmentQuestion', '선택지 삽입 완료', itemsCreated);
+                    log('createAssessmentQuestion', 'Choice insert completed', itemsCreated);
                     
                     // Verify items were created successfully
                     List<AssessmentQuestionItem__c> verifyItems = [
@@ -141,29 +145,29 @@ public with sharing class DKEDU_AssessmentQuestionController {
                         WHERE AssessmentQuestion__c = :assessmentQuestion.Id
                     ];
                     
-                    log('createAssessmentQuestion', '선택지 검증', verifyItems.size());
+                    log('createAssessmentQuestion', 'Choice verification', verifyItems.size());
                 }
             }
             
             // Return success response
             Map<String, Object> response = new Map<String, Object>{
                 'success' => true,
-                'message' => '질문이 성공적으로 저장되었습니다.',
+                'message' => 'Question has been successfully saved.',
                 'questionId' => assessmentQuestion.Id,
                 'questionName' => assessmentQuestion.Name,
                 'itemsCreated' => itemsCreated
             };
             
-            log('createAssessmentQuestion', '성공 응답 준비 완료', response);
+            log('createAssessmentQuestion', 'Success response prepared', response);
             return JSON.serialize(response);
             
         } catch (Exception e) {
-            log('createAssessmentQuestion', '예외 발생', e.getMessage());
+            log('createAssessmentQuestion', 'Exception occurred', e.getMessage());
             
             // Return error response  
             Map<String, Object> response = new Map<String, Object>{
                 'success' => false,
-                'message' => '저장 중 오류가 발생했습니다: ' + e.getMessage(),
+                'message' => 'An error occurred while saving: ' + e.getMessage(),
                 'error' => e.getStackTraceString()
             };
             
@@ -173,11 +177,11 @@ public with sharing class DKEDU_AssessmentQuestionController {
     
     /**
      * @description Get Assessment Questions for Related Question dropdown
-    * @return List<AssessmentQuestion__c> - List of questions for dropdown
+     * @return List<AssessmentQuestion__c> - List of questions for dropdown
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentQuestion__c> getAssessmentQuestions() {
-        log('getAssessmentQuestions', '메서드 시작', '');
+        log('getAssessmentQuestions', 'Method started', '');
         
         try {
             List<AssessmentQuestion__c> questions = [
@@ -187,27 +191,27 @@ public with sharing class DKEDU_AssessmentQuestionController {
                 LIMIT 100
             ];
             
-            log('getAssessmentQuestions', '질문 조회 완료', questions.size());
+            log('getAssessmentQuestions', 'Question query completed', questions.size());
             return questions;
             
         } catch (Exception e) {
-            log('getAssessmentQuestions', '예외 발생', e.getMessage());
-            throw new AuraHandledException('질문 목록을 가져오는 중 오류가 발생했습니다: ' + e.getMessage());
+            log('getAssessmentQuestions', 'Exception occurred', e.getMessage());
+            throw new AuraHandledException('An error occurred while retrieving question list: ' + e.getMessage());
         }
     }
     
     /**
      * @description Get Assessment Question Items for a specific question
      * @param questionId - Assessment Question Id
-    * @return List<AssessmentQuestionItem__c> - List of question items
+     * @return List<AssessmentQuestionItem__c> - List of question items
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentQuestionItem__c> getAssessmentQuestionItems(String questionId) {
-        log('getAssessmentQuestionItems', '메서드 시작', questionId);
+        log('getAssessmentQuestionItems', 'Method started', questionId);
         
         try {
             if (String.isBlank(questionId)) {
-                log('getAssessmentQuestionItems', 'questionId가 비어있음', '');
+                log('getAssessmentQuestionItems', 'questionId is blank', '');
                 return new List<AssessmentQuestionItem__c>();
             }
             
@@ -218,12 +222,12 @@ public with sharing class DKEDU_AssessmentQuestionController {
                 ORDER BY Order__c ASC
             ];
             
-            log('getAssessmentQuestionItems', '질문 항목 조회 완료', items.size());
+            log('getAssessmentQuestionItems', 'Question items query completed', items.size());
             return items;
             
         } catch (Exception e) {
-            log('getAssessmentQuestionItems', '예외 발생', e.getMessage());
-            throw new AuraHandledException('질문 항목을 가져오는 중 오류가 발생했습니다: ' + e.getMessage());
+            log('getAssessmentQuestionItems', 'Exception occurred', e.getMessage());
+            throw new AuraHandledException('An error occurred while retrieving question items: ' + e.getMessage());
         }
     }
 }

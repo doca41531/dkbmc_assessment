@@ -1,0 +1,145 @@
+<!--
+  @description       : Assessment Template Preview with Related Question Support
+  @author            : mingyu.park@dkbmc.com
+  @group             : DKEDU Components
+  @last modified on  : 2025-10-17
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<template>
+    <div class="preview-container">
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="slds-align_absolute-center slds-p-vertical_large">
+                <lightning-spinner alternative-text="Loading assessment preview..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error Message -->
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <span class="slds-assistive-text">Error</span>
+                <h2>Error loading assessment preview: {error.body.message}</h2>
+            </div>
+        </template>
+
+        <!-- Assessment Preview Content -->
+        <template if:true={hasData}>
+            <div class="sessions-container">
+                <!-- Sections Loop -->
+                <template for:each={assessmentData.sections} for:item="section">
+                    <div key={section.Id} class="session-group slds-card slds-m-bottom_medium">
+                        <!-- Section Header -->
+                        <div class="session-header slds-card__header slds-grid slds-grid_align-spread" style="padding: 1rem;">
+                            <h2 class="session-title slds-text-heading_small slds-truncate">
+                                {section.Name}
+                            </h2>
+                            <span class="session-score slds-badge slds-badge_brand">
+                                {section.SectionScore} 점
+                            </span>
+                        </div>
+
+                        <!-- Questions List -->
+                        <div class="questions-list slds-card__body">
+                            <template for:each={section.Questions} for:item="question">
+                                <div key={question.Id} class="question-item slds-border_bottom slds-p-vertical_medium">
+                                    
+                                    <!-- Related Question Indicator -->
+                                    <template if:true={question.isRelatedQuestion}>
+                                        <div class="related-question-indicator slds-m-bottom_small">
+                                            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small">
+                                                <lightning-icon icon-name="utility:link" size="x-small" variant="inverse" class="related-icon"></lightning-icon>
+                                                <span class="related-text slds-text-body_small">
+                                                    조건부 질문 - "{question.parentQuestionText}"에서 "{question.relatedCriteria}" 선택 시 표시
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Question Header -->
+                                    <div class="question-header slds-grid slds-grid_align-spread slds-m-bottom_small" data-related={question.isRelatedQuestion}>
+                                        <div class="question-text slds-text-body_regular slds-text-color_default">
+                                            {question.QuestionText}
+                                        </div>
+                                        <div class="question-meta slds-grid slds-grid_vertical-align-center slds-gutters_xx-small">
+                                            <span class="question-type slds-badge slds-badge_lightest">
+                                                {question.questionTypeLabel}
+                                            </span>
+                                            <span class="question-score slds-badge">
+                                                {question.QuestionScore} 점
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Question Content Based on Type -->
+                                    <div class="question-content" data-related={question.isRelatedQuestion}>
+                                        
+                                        <!-- Choosable & Multi Choosable -->
+                                        <template if:true={question.isChoosable}>
+                                            <div class="choices-container">
+                                                <template for:each={question.QuestionItems} for:item="choice">
+                                                    <div key={choice.Id} class="choice-option slds-grid slds-grid_align-spread slds-p-around_x-small slds-m-bottom_xx-small">
+                                                        <span class="choice-text slds-text-body_small">
+                                                            {choice.ContentText}
+                                                        </span>
+                                                        <span class="choice-score slds-text-body_small slds-text-color_weak">
+                                                            {choice.ItemScore}점
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+
+                                        <!-- Star Rating -->
+                                        <template if:true={question.isStarRating}>
+                                            <div class="star-rating-preview slds-grid slds-grid_vertical-align-center">
+                                                <div class="stars slds-grid">
+                                                    <template for:each={question.starArray} for:item="star">
+                                                        <span key={star.id} class="star slds-text-color_weak">☆</span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Short Answer -->
+                                        <template if:true={question.isShortAnswer}>
+                                            <lightning-input 
+                                                type="text" 
+                                                placeholder="답변을 입력하세요..." 
+                                                readonly
+                                                class="input-preview">
+                                            </lightning-input>
+                                        </template>
+
+                                        <!-- Number Point -->
+                                        <template if:true={question.isNumberPoint}>
+                                            <lightning-input 
+                                                type="number" 
+                                                placeholder="숫자를 입력하세요..." 
+                                                readonly
+                                                class="input-preview">
+                                            </lightning-input>
+                                        </template>
+
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- No Data Message -->
+        <template if:false={hasData}>
+            <template if:false={isLoading}>
+                <template if:false={error}>
+                    <div class="slds-align_absolute-center slds-p-vertical_large">
+                        <div class="slds-text-body_regular slds-text-color_weak">
+                            {noDataMessage}
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </template>
+    </div>
+</template>

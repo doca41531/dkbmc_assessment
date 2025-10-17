@@ -1,4 +1,4 @@
-/* Assessment Master Modal Component - DKEDU Styling (Updated) */
+/* Assessment Master Modal Component - DKEDU Styling (DK Lab Standards Compliant) */
 
 /* Form element base styling with improved state management */
 .slds-form-element {
@@ -54,7 +54,7 @@
 }
 
 /* Modal content scrolling */
-.slds-modal{
+.slds-modal {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -170,6 +170,7 @@
 .selected-targets-container .slds-card {
     border: 1px solid #d8dde6;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease;
 }
 
 .selected-targets-container .slds-card:hover {
@@ -243,22 +244,11 @@
     overflow-wrap: normal !important;
 }
 
-/* Responsive adjustments for target cards */
-@media (max-width: 768px) {
-    .selected-targets-container .slds-col.slds-large-size_1-of-3 {
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-    
-    .selected-targets-container .slds-card__body {
-        padding: 1rem !important;
-    }
-}
-
-/* Button Styling */
+/* Button Styling following SLDS standards */
 .slds-button_brand {
     background: #0176d3;
     border-color: #0176d3;
+    transition: all 0.2s ease;
 }
 
 .slds-button_brand:hover:not(:disabled) {
@@ -270,6 +260,7 @@
     background: white;
     border-color: #d8dde6;
     color: #0176d3;
+    transition: all 0.2s ease;
 }
 
 .slds-button_neutral:hover:not(:disabled) {
@@ -283,19 +274,10 @@
     cursor: not-allowed;
 }
 
-/* Search icon styling */
+/* Icon styling for search inputs */
 .slds-input-has-icon .slds-input__icon {
     fill: #706e6b;
     pointer-events: none;
-}
-
-/* Target cards layout */
-.selected-targets-container .slds-grid {
-    margin-bottom: 0.5rem;
-}
-
-.selected-targets-container .slds-card__body {
-    padding: 0.75rem;
 }
 
 /* Help text styling */
@@ -308,9 +290,13 @@
 /* Footer styling */
 .slds-modal__footer {
     border-radius: 0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
 }
 
-/* Text sizing */
+/* Text sizing consistency */
 .slds-text-body_small {
     font-size: 13px;
 }
@@ -368,13 +354,7 @@ input[type="date"][data-field]::-webkit-calendar-picker-indicator {
     right: 0.5rem;
 }
 
-/* Textarea styling with improved data retention */
-lightning-textarea[data-field] {
-    display: block;
-    width: 100%;
-}
-
-/* Form state indicators */
+/* Form state indicators for better UX */
 .form-field-dirty {
     border-left: 3px solid #1589ee;
     padding-left: 0.5rem;
@@ -403,13 +383,7 @@ lightning-textarea[data-field] {
     box-shadow: inset 0 0 0 1px #c23934;
 }
 
-/* Animation for smooth interactions */
-.contact-result-item,
-.selected-targets-container .slds-card {
-    transition: all 0.2s ease;
-}
-
-/* Focus states for accessibility */
+/* Focus states for accessibility compliance */
 .slds-button:focus {
     outline: 2px solid #1589ee;
     outline-offset: 2px;
@@ -420,7 +394,7 @@ lightning-textarea[data-field] {
     box-shadow: 0 0 0 2px rgba(1, 118, 211, 0.15);
 }
 
-/* Data persistence visual feedback */
+/* Form element state indicators */
 .slds-form-element[data-has-value="true"] .slds-form-element__label {
     color: #0176d3;
     font-weight: 600;
@@ -430,7 +404,7 @@ lightning-textarea[data-field] {
     color: #c23934;
 }
 
-/* Visual feedback for form state */
+/* Loading state for form inputs */
 .form-saving .slds-input,
 .form-saving .slds-select,
 .form-saving lightning-textarea {
@@ -447,13 +421,6 @@ lightning-textarea[data-field] {
     .selected-targets-container .slds-col.slds-large-size_1-of-3 {
         width: 100%;
     }
-}
-
-@media (max-width: 480px) {
-    .slds-form-element {
-        padding-left: 0.5rem;
-        padding-right: 1rem;
-    }
     
     .slds-modal__footer {
         flex-direction: column;
@@ -463,14 +430,26 @@ lightning-textarea[data-field] {
     .slds-modal__footer button {
         width: 100%;
     }
+}
+
+@media (max-width: 480px) {
+    .slds-form-element {
+        padding-left: 0.5rem;
+        padding-right: 1rem;
+    }
     
     .selected-targets-container .slds-col {
         width: 100%;
         margin-bottom: 0.5rem;
     }
+    
+    .slds-modal__container {
+        width: 95%;
+        max-width: none;
+    }
 }
 
-/* High contrast mode support */
+/* High contrast mode support for accessibility */
 @media (prefers-contrast: high) {
     .slds-input,
     .slds-select {
@@ -492,7 +471,7 @@ lightning-textarea[data-field] {
     }
 }
 
-/* Reduced motion support */
+/* Reduced motion support for accessibility */
 @media (prefers-reduced-motion: reduce) {
     .contact-result-item,
     .selected-targets-container .slds-card,
@@ -503,14 +482,7 @@ lightning-textarea[data-field] {
     }
 }
 
-/* Focus states for inputs */
-.slds-input:focus,
-.slds-select:focus {
-    outline: 2px solid var(--slds-c-input-color-border-focus);
-    outline-offset: -2px;
-}
-
-/* Ensure proper spacing in grid layout */
+/* Grid layout improvements */
 .slds-grid.slds-gutters .slds-col {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -521,12 +493,12 @@ lightning-textarea[data-field] {
     margin-bottom: 1rem;
 }
 
-/* Animation for modal appearance */
+/* Modal animation improvements */
 .slds-modal.slds-fade-in-open {
-    animation: slideIn 0.3s ease-out;
+    animation: dkModalSlideIn 0.3s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes dkModalSlideIn {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -537,7 +509,7 @@ lightning-textarea[data-field] {
     }
 }
 
-/* Data retention helper classes */
+/* Data persistence helper classes */
 .persist-data .slds-input,
 .persist-data .slds-select,
 .persist-data lightning-textarea {
@@ -556,4 +528,51 @@ lightning-textarea[data-field] {
     right: -5px;
     color: #1589ee;
     font-size: 0.75rem;
+}
+
+/* Error prevention for dropdown clipping */
+.slds-dropdown {
+    z-index: 9999;
+}
+
+/* Ensure proper z-index stacking */
+.slds-modal {
+    z-index: 9000;
+}
+
+.slds-backdrop {
+    z-index: 8999;
+}
+
+/* Improved focus management */
+.slds-input:focus,
+.slds-select:focus {
+    outline: 2px solid var(--slds-c-input-color-border-focus);
+    outline-offset: -2px;
+}
+
+/* Custom properties for theming support */
+:host {
+    --dkedu-primary-color: #0176d3;
+    --dkedu-error-color: #c23934;
+    --dkedu-success-color: #02844a;
+    --dkedu-warning-color: #fe9339;
+    --dkedu-border-radius: 0.25rem;
+    --dkedu-spacing-small: 0.5rem;
+    --dkedu-spacing-medium: 1rem;
+    --dkedu-spacing-large: 1.5rem;
+}
+
+/* Enhanced accessibility for screen readers */
+.slds-assistive-text {
+    position: absolute !important;
+    margin: -1px !important;
+    border: 0 !important;
+    padding: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
 }

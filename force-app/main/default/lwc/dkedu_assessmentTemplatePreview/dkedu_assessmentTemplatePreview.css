@@ -1,0 +1,229 @@
+.preview-container {
+    max-width: 100%;
+    background: #f3f3f3;
+    padding: 1rem;
+}
+
+.sessions-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.session-group {
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.session-header {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.session-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #181818;
+}
+
+.session-score {
+    background: transparent !important;
+    font-weight: 500;
+}
+
+.questions-list {
+    background: white;
+    padding: 0;
+}
+
+.question-item {
+    padding: 1.25rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.question-item:last-child {
+    border-bottom: none;
+}
+
+.question-header {
+    margin-bottom: 1rem;
+}
+
+.question-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #181818;
+    flex: 1;
+    margin-right: 1.25rem;
+}
+
+.question-meta {
+    gap: 0.75rem;
+}
+
+.question-type {
+    background: #f0f0f0 !important;
+    color: #706e6b !important;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.question-score {
+    background: #e8f4fd !important;
+    color: #0176d3 !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.question-content {
+    margin-left: 0;
+}
+
+/* Choice Options */
+.choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.choice-option {
+    padding: 0.5rem 0.75rem;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.choice-text {
+    font-size: 0.875rem;
+    color: #181818;
+}
+
+.choice-score {
+    color: #706e6b !important;
+    font-size: 0.6875rem;
+    font-weight: 500;
+}
+
+/* Star Rating */
+.star-rating-preview {
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stars {
+    gap: 0.125rem;
+}
+
+.star {
+    font-size: 1.125rem;
+    color: #d8dde6 !important;
+}
+
+/* Input Preview */
+.input-preview input {
+    background: #fafafa !important;
+    border-color: #d8dde6 !important;
+    font-size: 0.875rem;
+    color: #706e6b !important;
+}
+
+/* Related Question Styles - 새로 추가된 부분 */
+.related-question-indicator {
+    background: linear-gradient(90deg, #e8f4fd 0%, transparent 100%);
+    border-left: 3px solid #0176d3;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 4px 4px 0;
+    margin-left: -0.25rem;
+}
+
+.related-icon {
+    background: #0176d3 !important;
+    border-radius: 50%;
+    padding: 0.125rem;
+}
+
+.related-text {
+    color: #0176d3 !important;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* Child Question Styling */
+.question-item:has(.related-question-indicator) {
+    background: #f8fcff;
+    position: relative;
+}
+
+.question-item:has(.related-question-indicator)::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #0176d3 0%, #87ceeb 100%);
+}
+
+/* Alternative approach for browsers that don't support :has() */
+.question-item.related-question {
+    background: #f8fcff;
+    border-left: 2px solid #0176d3;
+    position: relative;
+}
+
+.question-item.related-question::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #0176d3 0%, #87ceeb 100%);
+}
+
+/* Indentation for related questions */
+.related-question .question-header,
+.related-question .question-content {
+    margin-left: 1.5rem;
+}
+
+/* CSS class for related question indentation */
+.related-question-indent {
+    margin-left: 1.5rem;
+}
+
+/* Data attribute approach for related question indentation */
+.question-header[data-related="true"],
+.question-content[data-related="true"] {
+    margin-left: 1.5rem;
+}
+
+/* Connection line styling */
+.related-question-connector {
+    border-left: 2px dashed #0176d3;
+    margin-left: 0.75rem;
+    padding-left: 1rem;
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+    
+    .question-text {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .question-meta {
+        align-self: flex-end;
+    }
+    
+    .related-question .question-header,
+    .related-question .question-content {
+        margin-left: 0.75rem;
+    }
+}

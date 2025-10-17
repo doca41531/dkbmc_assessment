@@ -1,22 +1,29 @@
 <!--
 /**
- * @description       : Assessment Master Modal Component - DKEDU (Complete Fixed Version)
+ * @description       : Assessment Master Modal Component - DKEDU (DK Lab Standards Compliant)
  * @author            : developer@company.com
  * @group             : DKEDU Components  
  * @created date      : 2025-01-15
- * @last modified on  : 2025-10-16
+ * @last modified on  : 2025-10-17
  * @last modified by  : mingyu.park@dkbmc.com
- * @version           : 1.3.0
+ * @version           : 2.0.0
  */
 -->
 <template>
-    <!-- Modal Section -->
+    <!-- Modal Section with proper key for re-rendering -->
     <div key={renderKey}>
-        <section class="slds-modal slds-fade-in-open slds-modal_large" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true">
+        <section class="slds-modal slds-fade-in-open slds-modal_large" 
+                 role="dialog" 
+                 tabindex="-1" 
+                 aria-labelledby="modal-heading-01" 
+                 aria-modal="true">
             <div class="slds-modal__container">
                 <!-- Modal Header -->
                 <header class="slds-modal__header">
-                    <button type="button" title="Cancel and close" class="slds-button slds-button_icon slds-modal__close slds-button_icon-bare" onclick={handleCancel}>
+                    <button type="button" 
+                            title="Cancel and close" 
+                            class="slds-button slds-button_icon slds-modal__close slds-button_icon-bare" 
+                            onclick={handleCancel}>
                         <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" class="slds-button__icon slds-button__icon_large">
                             <g>
                                 <path d="M310 254l130-131c6-6 6-15 0-21l-20-21c-6-6-15-6-21 0L268 212a10 10 0 01-14 0L123 80c-6-6-15-6-21 0l-21 21c-6 6-6 15 0 21l131 131c4 4 4 10 0 14L80 399c-6 6-6 15 0 21l21 21c6 6 15 6 21 0l131-131a10 10 0 0114 0l131 131c6 6 15 6 21 0l21-21c6-6 6-15 0-21L310 268a10 10 0 010-14z"></path>
@@ -42,7 +49,8 @@
 
                     <!-- Basic Information Section -->
                     <section class="slds-m-bottom_medium">
-                        <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
+                        <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" 
+                            style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
                             Basic Information
                         </h3>
                         
@@ -122,6 +130,38 @@
                                     </div>
                                 </div>
 
+                                <!-- Description -->
+                                <div class="slds-col slds-size_1-of-1">
+                                    <div class="slds-form-element slds-m-bottom_medium">
+                                        <label class="slds-form-element__label" for="description">
+                                            Description
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-textarea
+                                                name="description"
+                                                data-field="description"
+                                                label=""
+                                                placeholder="Enter description"
+                                                value={description}
+                                                onchange={handleTextareaChange}
+                                                max-length="1000">
+                                            </lightning-textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Assessment Configuration Section -->
+                    <section class="slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" 
+                            style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
+                            Assessment Configuration
+                        </h3>
+                        
+                        <div class="slds-p-horizontal_small slds-p-top_small">
+                            <div class="slds-grid slds-gutters slds-wrap">
                                 <!-- Assessment Template -->
                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="slds-form-element slds-m-bottom_medium">
@@ -147,12 +187,10 @@
                                                                autocomplete="off" 
                                                                role="textbox" />
                                                         <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                            </svg>
+                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
                                                         </span>
                                                     </div>
-                                                    <template if:true={isTemplateDropdownOpen}>
+                                                    <template lwc:if={isTemplateDropdownOpen}>
                                                         <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
                                                              role="listbox"
                                                              onmouseenter={handleDropdownMouseEnter}
@@ -177,7 +215,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <template if:true={selectedTemplate}>
+                                        <template lwc:if={selectedTemplate}>
                                             <div class="slds-form-element__help">
                                                 Selected: {selectedTemplate.label}
                                             </div>
@@ -210,12 +248,10 @@
                                                                autocomplete="off" 
                                                                role="textbox" />
                                                         <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                            </svg>
+                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
                                                         </span>
                                                     </div>
-                                                    <template if:true={isGradeDropdownOpen}>
+                                                    <template lwc:if={isGradeDropdownOpen}>
                                                         <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
                                                              role="listbox"
                                                              onmouseenter={handleDropdownMouseEnter}
@@ -239,7 +275,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <template if:true={selectedGrade}>
+                                        <template lwc:if={selectedGrade}>
                                             <div class="slds-form-element__help">
                                                 Selected: {selectedGrade.label}
                                             </div>
@@ -272,12 +308,10 @@
                                                                autocomplete="off" 
                                                                role="textbox" />
                                                         <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                            </svg>
+                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
                                                         </span>
                                                     </div>
-                                                    <template if:true={isAssessmentTypeDropdownOpen}>
+                                                    <template lwc:if={isAssessmentTypeDropdownOpen}>
                                                         <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
                                                              role="listbox"
                                                              onmouseenter={handleDropdownMouseEnter}
@@ -329,12 +363,10 @@
                                                                autocomplete="off" 
                                                                role="textbox" />
                                                         <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                            </svg>
+                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
                                                         </span>
                                                     </div>
-                                                    <template if:true={isAssignTypeDropdownOpen}>
+                                                    <template lwc:if={isAssignTypeDropdownOpen}>
                                                         <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
                                                              role="listbox"
                                                              onmouseenter={handleDropdownMouseEnter}
@@ -360,34 +392,15 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Description -->
-                                <div class="slds-col slds-size_1-of-1">
-                                    <div class="slds-form-element slds-m-bottom_medium">
-                                        <label class="slds-form-element__label" for="description">
-                                            Description
-                                        </label>
-                                        <div class="slds-form-element__control">
-                                            <lightning-textarea
-                                                name="description"
-                                                data-field="description"
-                                                label=""
-                                                placeholder="Enter description"
-                                                value={description}
-                                                onchange={handleTextareaChange}
-                                                max-length="1000">
-                                            </lightning-textarea>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </section>
 
                     <!-- Assessment Target Section (Manual Only) -->
-                    <template if:true={isManualAssign}>
+                    <template lwc:if={isManualAssign}>
                         <section class="slds-m-bottom_medium" data-contact-section="true">
-                            <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
+                            <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small" 
+                                style="border-radius: 0.5rem; font-size: 20px; padding: 0.25rem 0.75rem;">
                                 Assessment Target
                             </h3>
                             
@@ -395,6 +408,7 @@
                                 <!-- Contact Search -->
                                 <div class="slds-form-element slds-m-bottom_medium">
                                     <label class="slds-form-element__label" for="contactSearch">
+                                        <abbr class="slds-required" title="required" style="color: #c23934;">*</abbr>
                                         Search Contacts
                                     </label>
                                     <div class="slds-form-element__control">
@@ -415,12 +429,10 @@
                                                            autocomplete="off" 
                                                            role="textbox" />
                                                     <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
-                                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                        </svg>
+                                                        <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
                                                     </span>
                                                 </div>
-                                                <template if:true={isContactDropdownOpen}>
+                                                <template lwc:if={isContactDropdownOpen}>
                                                     <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
                                                          role="listbox"
                                                          onmouseenter={handleDropdownMouseEnter}
@@ -439,8 +451,10 @@
                                                                     </div>
                                                                 </li>
                                                             </template>
-                                                            <template if:false={hasSearchResults}>
-                                                                <template if:true={hasSearchedContacts}>
+                                                            <template lwc:if={hasSearchedContacts}>
+                                                                <template lwc:if={hasSearchResults}>
+                                                                </template>
+                                                                <template lwc:else>
                                                                     <li role="presentation" class="slds-listbox__item">
                                                                         <div class="slds-media slds-listbox__option slds-listbox__option_entity">
                                                                             <span class="slds-media__body">
@@ -459,7 +473,7 @@
                                 </div>
 
                                 <!-- Selected Targets -->
-                                <template if:true={hasSelectedTargets}>
+                                <template lwc:if={hasSelectedTargets}>
                                     <div class="selected-targets-container" key={selectedTargetCount}>
                                         <h4 class="slds-text-heading_small slds-m-bottom_small">
                                             Selected Targets ({selectedTargetCount})
@@ -471,19 +485,21 @@
                                                         <div class="slds-card__body slds-card__body_inner">
                                                             <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
                                                                 <div class="slds-col slds-has-flexi-truncate" style="min-width: 0; flex: 1;">
-                                                                    <div class="slds-truncate" style="word-break: keep-all; white-space: nowrap; overflow: hidden;">
-                                                                        <strong style="font-size: 1rem; font-weight: 700; color: #181818;" title={target.name}>
+                                                                    <div class="slds-truncate" 
+                                                                         style="word-break: keep-all; white-space: nowrap; overflow: hidden;">
+                                                                        <strong style="font-size: 1rem; font-weight: 700; color: #181818;" 
+                                                                                title={target.name}>
                                                                             {target.name}
                                                                         </strong>
                                                                     </div>
-                                                                    <template if:true={target.email}>
+                                                                    <template lwc:if={target.email}>
                                                                         <div class="slds-text-body_small slds-text-color_weak slds-truncate" 
                                                                              style="margin-top: 0.25rem; word-break: keep-all;" 
                                                                              title={target.email}>
                                                                             {target.email}
                                                                         </div>
                                                                     </template>
-                                                                    <template if:true={target.account}>
+                                                                    <template lwc:if={target.account}>
                                                                         <div class="slds-text-body_small slds-text-color_weak slds-truncate" 
                                                                              style="margin-top: 0.125rem; word-break: keep-all;" 
                                                                              title={target.account}>
@@ -517,10 +533,10 @@
                 <!-- Modal Footer -->
                 <footer class="slds-modal__footer">
                     <button class="slds-button slds-button_neutral" onclick={handleCancel}>
-                        Cancel
+                        {labels.cancel}
                     </button>
                     <button class="slds-button slds-button_brand" onclick={handleSave} disabled={isLoading}>
-                        <template if:true={isLoading}>
+                        <template lwc:if={isLoading}>
                             <span class="slds-spinner_container slds-spinner_inline">
                                 <div role="status" class="slds-spinner slds-spinner_xx-small slds-spinner_inline">
                                     <span class="slds-assistive-text">Loading</span>
@@ -529,7 +545,7 @@
                                 </div>
                             </span>
                         </template>
-                        Save
+                        {labels.save}
                     </button>
                 </footer>
             </div>

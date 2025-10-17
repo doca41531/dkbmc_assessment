@@ -1,31 +1,46 @@
 /**
- * @description       : Assessment Master Controller - DKEDU (Complete Fixed Version)
+ * @description       : Assessment Master Controller - DKEDU (DK Lab Standards Compliant)
  * @author            : developer@company.com
  * @group             : DKEDU Controllers
  * @created date      : 2025-01-15
- * @last modified on  : 2025-10-16
+ * @last modified on  : 2025-10-17
  * @last modified by  : mingyu.park@dkbmc.com
- * @version           : 1.3.0
+ * @version           : 2.0.0
  */
 public with sharing class DKEDU_AssessmentMasterController {
+    
+    // Debug switch following DK Lab standards
+    public static final Boolean DEBUG = true;
+    
+    // Constants following UPPERCASE naming convention
+    private static final Integer QUERY_LIMIT = 1000;
+    private static final Integer SEARCH_LIMIT = 50;
+    private static final String STATUS_WAITING = 'Waiting';
+    private static final String ASSIGN_TYPE_MANUAL = 'Manual';
     
     /**
      * @description Get active Assessment Templates
      * @return List of Assessment Templates
+     * @throws AuraHandledException when retrieval fails
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentTemplate__c> getAssessmentTemplates() {
         try {
-            return [
+            DKEDU_DebugUtils.log('getAssessmentTemplates - Start');
+            
+            List<AssessmentTemplate__c> templates = [
                 SELECT Id, Name, Description__c, IsActive__c
                 FROM AssessmentTemplate__c 
                 WHERE IsActive__c = true
                 ORDER BY Name ASC
-                LIMIT 1000
+                LIMIT :QUERY_LIMIT
             ];
+            
+            DKEDU_DebugUtils.log('getAssessmentTemplates - Success', templates.size());
+            return templates;
+            
         } catch (Exception e) {
-            System.debug('Error in getAssessmentTemplates: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
+            DKEDU_DebugUtils.log('getAssessmentTemplates - Exception', e);
             throw new AuraHandledException('Failed to retrieve assessment templates: ' + e.getMessage());
         }
     }
@@ -33,325 +48,232 @@ public with sharing class DKEDU_AssessmentMasterController {
     /**
      * @description Get active Assessment Grades
      * @return List of Assessment Grades
+     * @throws AuraHandledException when retrieval fails
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentGrade__c> getAssessmentGrades() {
         try {
-            return [
+            DKEDU_DebugUtils.log('getAssessmentGrades - Start');
+            
+            List<AssessmentGrade__c> grades = [
                 SELECT Id, Name, IsActive__c
                 FROM AssessmentGrade__c 
                 WHERE IsActive__c = true
                 ORDER BY Name ASC
-                LIMIT 1000
+                LIMIT :QUERY_LIMIT
             ];
+            
+            DKEDU_DebugUtils.log('getAssessmentGrades - Success', grades.size());
+            return grades;
+            
         } catch (Exception e) {
-            System.debug('Error in getAssessmentGrades: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
+            DKEDU_DebugUtils.log('getAssessmentGrades - Exception', e);
             throw new AuraHandledException('Failed to retrieve assessment grades: ' + e.getMessage());
         }
     }
     
     /**
      * @description Search Contacts for assessment targets
-     * @param searchTerm Search term for contact name
-     * @return List of Contacts
+     * @param searchTerm Search term for contact name (minimum 1 character)
+     * @return List of Contacts matching search criteria
+     * @throws AuraHandledException when search fails
      */
     @AuraEnabled
     public static List<Contact> searchContacts(String searchTerm) {
         try {
-            System.debug('SearchContacts called with term: ' + searchTerm);
+            DKEDU_DebugUtils.log('searchContacts - Start', searchTerm);
             
+            // Validate input parameters
             if (String.isBlank(searchTerm) || searchTerm.length() < 1) {
-                System.debug('Search term too short or blank, returning empty list');
+                DKEDU_DebugUtils.log('searchContacts - Invalid search term');
                 return new List<Contact>();
             }
             
             String cleanSearchTerm = String.escapeSingleQuotes(searchTerm.trim());
             String searchPattern = '%' + cleanSearchTerm + '%';
             
-            System.debug('Executing query with pattern: ' + searchPattern);
-            
             List<Contact> results = [
                 SELECT Id, Name, Email, Phone, Account.Name, AccountId
                 FROM Contact 
                 WHERE Name LIKE :searchPattern
                 ORDER BY Name ASC
-                LIMIT 50
+                LIMIT :SEARCH_LIMIT
             ];
             
-            System.debug('Found ' + results.size() + ' contacts');
+            DKEDU_DebugUtils.log('searchContacts - Success', results.size());
             return results;
             
         } catch (Exception e) {
-            System.debug('Error in searchContacts: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
+            DKEDU_DebugUtils.log('searchContacts - Exception', e);
             throw new AuraHandledException('Failed to search contacts: ' + e.getMessage());
         }
     }
     
     /**
-     * @description Create new Assessment Master with enhanced debugging
+     * @description Create new Assessment Master with comprehensive validation
      * @param masterData JSON string containing master information
-     * @return Result string with success/error information
+     * @return JSON string with success/error information and masterId
+     * @throws AuraHandledException when creation fails
      */
     @AuraEnabled
     public static String createAssessmentMaster(String masterData) {
         Savepoint sp = Database.setSavepoint();
         
         try {
-            System.debug('=== START createAssessmentMaster ===');
-            System.debug('Raw masterData: ' + masterData);
+            DKEDU_DebugUtils.log('createAssessmentMaster - Start', masterData);
             
-            // Parse the master data
-            Map<String, Object> masterMap;
-            try {
-                masterMap = (Map<String, Object>) JSON.deserializeUntyped(masterData);
-                System.debug('Successfully parsed masterMap: ' + masterMap);
-            } catch (Exception parseError) {
-                System.debug('JSON Parse Error: ' + parseError.getMessage());
-                throw new AuraHandledException('Failed to parse master data: ' + parseError.getMessage());
-            }
-            
-            // Validate required fields
-            try {
-                validateMasterData(masterMap);
-                System.debug('Validation passed');
-            } catch (Exception validationError) {
-                System.debug('Validation Error: ' + validationError.getMessage());
-                throw validationError;
-            }
+            // Parse and validate master data
+            Map<String, Object> masterMap = parseAndValidateMasterData(masterData);
             
             // Create Assessment Master record
-            AssessmentMaster__c master = new AssessmentMaster__c();
+            AssessmentMaster__c master = buildAssessmentMaster(masterMap);
             
-            try {
-                // Set basic fields with detailed logging
-                System.debug('Setting basic fields...');
-                
-                String masterName = (String) masterMap.get('masterName');
-                System.debug('masterName: ' + masterName);
-                master.Name = masterName;
-                
-                Boolean isActive = (Boolean) masterMap.get('isActive');
-                System.debug('isActive: ' + isActive);
-                master.IsActive__c = isActive;
-                
-                String startDateStr = (String) masterMap.get('startDate');
-                System.debug('startDate string: ' + startDateStr);
-                master.AssessmentStartDate__c = Date.valueOf(startDateStr);
-                
-                String endDateStr = (String) masterMap.get('endDate');
-                System.debug('endDate string: ' + endDateStr);
-                master.AssessmentEndDate__c = Date.valueOf(endDateStr);
-                
-                System.debug('Basic fields set successfully');
-                
-            } catch (Exception basicFieldsError) {
-                System.debug('Error setting basic fields: ' + basicFieldsError.getMessage());
-                throw new AuraHandledException('Error setting basic fields: ' + basicFieldsError.getMessage());
-            }
+            // Insert master record
+            Database.insert(master);
+            DKEDU_DebugUtils.log('createAssessmentMaster - Master created', master.Id);
             
-            try {
-                // Assessment Template - 스키마 확인: AssessmentTemplate__c (Lookup)
-                String templateId = (String) masterMap.get('assessmentTemplateId');
-                System.debug('templateId: ' + templateId);
-                if (!String.isBlank(templateId)) {
-                    master.AssessmentTemplate__c = templateId;
-                    System.debug('Template field set successfully');
-                }
-                
-            } catch (Exception templateError) {
-                System.debug('Error setting template field: ' + templateError.getMessage());
-                throw new AuraHandledException('Error setting template field: ' + templateError.getMessage());
-            }
+            // Create targets if Manual assign type
+            createTargetsIfRequired(master.Id, masterMap);
             
-            try {
-                // Assessment Grade - 스키마 확인: GradeId__c (Lookup to AssessmentGrade__c)
-                String gradeId = (String) masterMap.get('assessmentGradeId');
-                System.debug('gradeId: ' + gradeId);
-                if (!String.isBlank(gradeId)) {
-                    master.GradeId__c = gradeId;
-                    System.debug('Grade field set successfully');
-                }
-                
-            } catch (Exception gradeError) {
-                System.debug('Error setting grade field: ' + gradeError.getMessage());
-                throw new AuraHandledException('Error setting grade field: ' + gradeError.getMessage());
-            }
+            // Build success response
+            Map<String, Object> result = new Map<String, Object>{
+                'success' => true,
+                'message' => 'Assessment Master created successfully',
+                'masterId' => master.Id
+            };
             
-            try {
-                // Assessment Type - 스키마 확인: AssessmentType__c (Picklist)
-                String assessmentType = (String) masterMap.get('assessmentType');
-                System.debug('assessmentType: ' + assessmentType);
-                if (!String.isBlank(assessmentType)) {
-                    master.AssessmentType__c = assessmentType;
-                    System.debug('Assessment Type set successfully');
-                }
-                
-            } catch (Exception typeError) {
-                System.debug('Error setting assessment type: ' + typeError.getMessage());
-                throw new AuraHandledException('Error setting assessment type: ' + typeError.getMessage());
-            }
-            
-            try {
-                // Assign Type - 스키마 확인: AssignType__c (Picklist)
-                String assignType = (String) masterMap.get('assignType');
-                System.debug('assignType: ' + assignType);
-                if (!String.isBlank(assignType)) {
-                    master.AssignType__c = assignType;
-                    System.debug('Assign Type set successfully');
-                }
-                
-            } catch (Exception assignError) {
-                System.debug('Error setting assign type: ' + assignError.getMessage());
-                throw new AuraHandledException('Error setting assign type: ' + assignError.getMessage());
-            }
-            
-            try {
-                // Description - 스키마 확인: Description__c (LongText)
-                String description = (String) masterMap.get('description');
-                System.debug('description: ' + description);
-                if (!String.isBlank(description)) {
-                    master.Description__c = description;
-                    System.debug('Description set successfully');
-                }
-                
-                // Set initial status - 스키마 확인: Status__c (Picklist: Waiting, Processing, Complete)
-                master.Status__c = 'Waiting';
-                System.debug('Status set to Waiting');
-                
-            } catch (Exception descError) {
-                System.debug('Error setting description/status: ' + descError.getMessage());
-                throw new AuraHandledException('Error setting description/status: ' + descError.getMessage());
-            }
-            
-            // Log the complete master object before insert
-            System.debug('Complete master object before insert: ' + master);
-            
-            // Insert Assessment Master
-            try {
-                System.debug('Attempting to insert Assessment Master...');
-                insert master;
-                System.debug('Assessment Master created successfully with Id: ' + master.Id);
-                
-            } catch (DmlException dmlError) {
-                System.debug('DML Error during insert: ' + dmlError.getMessage());
-                System.debug('DML Error details: ' + dmlError.getDmlMessage(0));
-                System.debug('DML Error fields: ' + dmlError.getDmlFieldNames(0));
-                throw new AuraHandledException('Database error during insert: ' + dmlError.getDmlMessage(0));
-            }
-            
-            // Create Assessment Targets if Manual assign type
-            String assignType = (String) masterMap.get('assignType');
-            if ('Manual'.equals(assignType)) {
-                try {
-                    List<Object> targets = (List<Object>) masterMap.get('targets');
-                    System.debug('Creating targets for Manual assign type. Target count: ' + (targets != null ? targets.size() : 0));
-                    if (targets != null && !targets.isEmpty()) {
-                        createAssessmentTargets(master.Id, targets);
-                    }
-                } catch (Exception targetError) {
-                    System.debug('Error creating targets: ' + targetError.getMessage());
-                    // Don't fail the entire transaction for target creation errors
-                    System.debug('Continuing without targets due to error: ' + targetError.getMessage());
-                }
-            }
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', true);
-            result.put('message', 'Assessment Master created successfully');
-            result.put('masterId', master.Id);
-            
-            System.debug('=== SUCCESS createAssessmentMaster ===');
+            DKEDU_DebugUtils.log('createAssessmentMaster - Success', result);
             return JSON.serialize(result);
             
         } catch (DmlException e) {
             Database.rollback(sp);
-            System.debug('=== DML EXCEPTION ===');
-            System.debug('DML Error: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
-            
-            String errorMsg = 'Database error: ';
-            if (e.getNumDml() > 0) {
-                errorMsg += e.getDmlMessage(0);
-                System.debug('DML Field errors: ' + e.getDmlFieldNames(0));
-            } else {
-                errorMsg += e.getMessage();
-            }
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', false);
-            result.put('message', errorMsg);
-            result.put('errorType', 'DmlException');
-            
-            return JSON.serialize(result);
-            
+            return handleDmlException(e);
         } catch (AuraHandledException e) {
             Database.rollback(sp);
-            System.debug('=== AURA HANDLED EXCEPTION ===');
-            System.debug('Aura Error: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', false);
-            result.put('message', e.getMessage());
-            result.put('errorType', 'AuraHandledException');
-            
-            return JSON.serialize(result);
-            
+            return handleAuraException(e);
         } catch (Exception e) {
             Database.rollback(sp);
-            System.debug('=== GENERAL EXCEPTION ===');
-            System.debug('General Error: ' + e.getMessage());
-            System.debug('Error Type: ' + e.getTypeName());
-            System.debug('Stack trace: ' + e.getStackTraceString());
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', false);
-            result.put('message', 'Unexpected error: ' + e.getMessage() + ' (Type: ' + e.getTypeName() + ')');
-            result.put('errorType', 'GeneralException');
-            result.put('errorTypeName', e.getTypeName());
-            
-            return JSON.serialize(result);
+            return handleGeneralException(e);
+        }
+    }
+    
+    /**
+     * @description Parse and validate master data JSON
+     * @param masterData Raw JSON string
+     * @return Parsed and validated master data map
+     * @throws AuraHandledException when parsing or validation fails
+     */
+    private static Map<String, Object> parseAndValidateMasterData(String masterData) {
+        try {
+            Map<String, Object> masterMap = (Map<String, Object>) JSON.deserializeUntyped(masterData);
+            validateMasterData(masterMap);
+            return masterMap;
+        } catch (JSONException e) {
+            DKEDU_DebugUtils.log('parseAndValidateMasterData - JSON Parse Error', e);
+            throw new AuraHandledException('Failed to parse master data: ' + e.getMessage());
+        }
+    }
+    
+    /**
+     * @description Build Assessment Master record from validated data
+     * @param masterMap Validated master data map
+     * @return Configured AssessmentMaster__c record
+     */
+    private static AssessmentMaster__c buildAssessmentMaster(Map<String, Object> masterMap) {
+        AssessmentMaster__c master = new AssessmentMaster__c();
+        
+        // Set basic fields
+        master.Name = (String) masterMap.get('masterName');
+        master.IsActive__c = (Boolean) masterMap.get('isActive');
+        master.AssessmentStartDate__c = Date.valueOf((String) masterMap.get('startDate'));
+        master.AssessmentEndDate__c = Date.valueOf((String) masterMap.get('endDate'));
+        
+        // Set lookup fields
+        master.AssessmentTemplate__c = (String) masterMap.get('assessmentTemplateId');
+        master.GradeId__c = (String) masterMap.get('assessmentGradeId');
+        
+        // Set picklist fields
+        master.AssessmentType__c = (String) masterMap.get('assessmentType');
+        master.AssignType__c = (String) masterMap.get('assignType');
+        
+        // Set optional fields
+        String description = (String) masterMap.get('description');
+        if (!String.isBlank(description)) {
+            master.Description__c = description;
+        }
+        
+        // Set initial status
+        master.Status__c = STATUS_WAITING;
+        
+        DKEDU_DebugUtils.log('buildAssessmentMaster - Master built', master);
+        return master;
+    }
+    
+    /**
+     * @description Create assessment targets if assign type is Manual
+     * @param masterId Assessment Master ID
+     * @param masterMap Master data containing targets
+     */
+    private static void createTargetsIfRequired(Id masterId, Map<String, Object> masterMap) {
+        String assignType = (String) masterMap.get('assignType');
+        
+        if (ASSIGN_TYPE_MANUAL.equals(assignType)) {
+            List<Object> targets = (List<Object>) masterMap.get('targets');
+            if (targets != null && !targets.isEmpty()) {
+                createAssessmentTargets(masterId, targets);
+            }
         }
     }
     
     /**
      * @description Validate master data before processing
      * @param masterMap Parsed master data map
+     * @throws AuraHandledException when validation fails
      */
     private static void validateMasterData(Map<String, Object> masterMap) {
         List<String> errors = new List<String>();
         
-        if (String.isBlank((String) masterMap.get('masterName'))) {
-            errors.add('Master Name is required');
-        }
+        // Required field validation
+        validateRequiredField(masterMap, 'masterName', 'Master Name', errors);
+        validateRequiredField(masterMap, 'startDate', 'Start Date', errors);
+        validateRequiredField(masterMap, 'endDate', 'End Date', errors);
+        validateRequiredField(masterMap, 'assessmentTemplateId', 'Assessment Template', errors);
+        validateRequiredField(masterMap, 'assessmentGradeId', 'Assessment Grade', errors);
+        validateRequiredField(masterMap, 'assessmentType', 'Assessment Type', errors);
+        validateRequiredField(masterMap, 'assignType', 'Assign Type', errors);
         
-        if (String.isBlank((String) masterMap.get('startDate'))) {
-            errors.add('Start Date is required');
-        }
+        // Date range validation
+        validateDateRange(masterMap, errors);
         
-        if (String.isBlank((String) masterMap.get('endDate'))) {
-            errors.add('End Date is required');
-        }
+        // Manual assign type validation
+        validateManualAssignTargets(masterMap, errors);
         
-        if (String.isBlank((String) masterMap.get('assessmentTemplateId'))) {
-            errors.add('Assessment Template is required');
+        if (!errors.isEmpty()) {
+            String errorMessage = 'Validation errors: ' + String.join(errors, ', ');
+            DKEDU_DebugUtils.log('validateMasterData - Validation failed', errorMessage);
+            throw new AuraHandledException(errorMessage);
         }
-        
-        if (String.isBlank((String) masterMap.get('assessmentGradeId'))) {
-            errors.add('Assessment Grade is required');
+    }
+    
+    /**
+     * @description Validate required field presence
+     * @param masterMap Data map to validate
+     * @param fieldKey Field key to check
+     * @param fieldLabel User-friendly field name
+     * @param errors Error list to append to
+     */
+    private static void validateRequiredField(Map<String, Object> masterMap, String fieldKey, String fieldLabel, List<String> errors) {
+        if (String.isBlank((String) masterMap.get(fieldKey))) {
+            errors.add(fieldLabel + ' is required');
         }
-        
-        if (String.isBlank((String) masterMap.get('assessmentType'))) {
-            errors.add('Assessment Type is required');
-        }
-        
-        if (String.isBlank((String) masterMap.get('assignType'))) {
-            errors.add('Assign Type is required');
-        }
-        
-        // Validate dates
+    }
+    
+    /**
+     * @description Validate date range logic
+     * @param masterMap Data map containing dates
+     * @param errors Error list to append to
+     */
+    private static void validateDateRange(Map<String, Object> masterMap, List<String> errors) {
         String startDateStr = (String) masterMap.get('startDate');
         String endDateStr = (String) masterMap.get('endDate');
         
@@ -365,245 +287,135 @@ public with sharing class DKEDU_AssessmentMasterController {
                 }
             } catch (Exception dateError) {
                 errors.add('Invalid date format');
+                DKEDU_DebugUtils.log('validateDateRange - Date parsing error', dateError);
             }
         }
-        
-        // Validate targets for Manual assign type
+    }
+    
+    /**
+     * @description Validate Manual assign type targets
+     * @param masterMap Data map containing assign type and targets
+     * @param errors Error list to append to
+     */
+    private static void validateManualAssignTargets(Map<String, Object> masterMap, List<String> errors) {
         String assignType = (String) masterMap.get('assignType');
-        if ('Manual'.equals(assignType)) {
+        
+        if (ASSIGN_TYPE_MANUAL.equals(assignType)) {
             List<Object> targets = (List<Object>) masterMap.get('targets');
             if (targets == null || targets.isEmpty()) {
                 errors.add('Assessment Target is required when Assign Type is Manual');
             }
         }
-        
-        if (!errors.isEmpty()) {
-            throw new AuraHandledException('Validation errors: ' + String.join(errors, ', '));
-        }
     }
     
     /**
-     * @description Create Assessment Target records with correct field names
+     * @description Create Assessment Target records
      * @param masterId Assessment Master ID
      * @param targets List of target data
+     * @throws AuraHandledException when target creation fails
      */
     private static void createAssessmentTargets(Id masterId, List<Object> targets) {
-        List<AssessmentTarget__c> targetsToInsert = new List<AssessmentTarget__c>();
-        
         try {
-            System.debug('Creating Assessment Targets for master: ' + masterId);
-            System.debug('Target data: ' + targets);
+            DKEDU_DebugUtils.log('createAssessmentTargets - Start', targets.size());
+            
+            List<AssessmentTarget__c> targetsToInsert = new List<AssessmentTarget__c>();
             
             for (Object targetObj : targets) {
                 Map<String, Object> targetMap = (Map<String, Object>) targetObj;
-                System.debug('Processing target: ' + targetMap);
                 
                 AssessmentTarget__c target = new AssessmentTarget__c();
                 target.AssessmentMaster__c = masterId;
                 
-                // Contact field - 스키마에서 확인한 정확한 필드명 사용
                 String contactId = (String) targetMap.get('contactId');
                 if (!String.isBlank(contactId)) {
-                    try {
-                        target.ContactId__c = contactId;  // 스키마에서 확인한 필드명
-                        System.debug('Set ContactId__c: ' + contactId);
-                    } catch (Exception contactFieldError) {
-                        System.debug('ContactId__c field error: ' + contactFieldError.getMessage());
-                        // 필드명이 다를 수 있으므로 다른 가능성 시도
-                        try {
-                            target.put('Contact__c', contactId);
-                            System.debug('Set Contact__c: ' + contactId);
-                        } catch (Exception alternateError) {
-                            System.debug('Contact__c field also failed: ' + alternateError.getMessage());
-                            // Contact 필드 없이도 Target 생성 가능하도록 계속 진행
-                        }
-                    }
+                    target.ContactId__c = contactId;
                 }
                 
                 targetsToInsert.add(target);
             }
             
-            System.debug('Targets to insert count: ' + targetsToInsert.size());
-            System.debug('Target objects: ' + targetsToInsert);
-            
             if (!targetsToInsert.isEmpty()) {
-                insert targetsToInsert;
-                System.debug('Assessment Targets created successfully: ' + targetsToInsert.size());
-                
-                // 생성된 Target ID들 로그
-                for (AssessmentTarget__c target : targetsToInsert) {
-                    System.debug('Created target ID: ' + target.Id);
-                }
-            } else {
-                System.debug('No targets to insert');
+                Database.insert(targetsToInsert);
+                DKEDU_DebugUtils.log('createAssessmentTargets - Success', targetsToInsert.size());
             }
             
-        } catch (DmlException e) {
-            System.debug('DML Error creating targets: ' + e.getMessage());
-            System.debug('DML Error details: ' + e.getDmlMessage(0));
-            System.debug('DML Error fields: ' + e.getDmlFieldNames(0));
-            throw new AuraHandledException('Failed to create assessment targets: ' + e.getDmlMessage(0));
         } catch (Exception e) {
-            System.debug('General Error creating targets: ' + e.getMessage());
-            System.debug('Stack trace: ' + e.getStackTraceString());
+            DKEDU_DebugUtils.log('createAssessmentTargets - Exception', e);
             throw new AuraHandledException('Failed to create assessment targets: ' + e.getMessage());
         }
     }
     
     /**
-     * @description Test method to validate field accessibility
-     * @return Field validation result
+     * @description Handle DML exceptions with detailed error information
+     * @param e DML exception to handle
+     * @return JSON error response
      */
-    @AuraEnabled
-    public static String testFieldAccess() {
-        try {
-            System.debug('=== Testing Field Access ===');
-            
-            AssessmentMaster__c testMaster = new AssessmentMaster__c();
-            
-            // Test each field individually
-            Map<String, Object> fieldTest = new Map<String, Object>();
-            
-            try {
-                testMaster.Name = 'Test';
-                fieldTest.put('Name', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('Name', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.IsActive__c = true;
-                fieldTest.put('IsActive__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('IsActive__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.AssessmentStartDate__c = Date.today();
-                fieldTest.put('AssessmentStartDate__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('AssessmentStartDate__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.AssessmentEndDate__c = Date.today();
-                fieldTest.put('AssessmentEndDate__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('AssessmentEndDate__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.AssessmentTemplate__c = 'test';
-                fieldTest.put('AssessmentTemplate__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('AssessmentTemplate__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.GradeId__c = 'test';
-                fieldTest.put('GradeId__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('GradeId__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.AssessmentType__c = 'Strategy';
-                fieldTest.put('AssessmentType__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('AssessmentType__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.AssignType__c = 'Manual';
-                fieldTest.put('AssignType__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('AssignType__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.Description__c = 'Test description';
-                fieldTest.put('Description__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('Description__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            try {
-                testMaster.Status__c = 'Waiting';
-                fieldTest.put('Status__c', 'OK');
-            } catch (Exception e) {
-                fieldTest.put('Status__c', 'ERROR: ' + e.getMessage());
-            }
-            
-            System.debug('Field test results: ' + fieldTest);
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', true);
-            result.put('fieldTests', fieldTest);
-            
-            return JSON.serialize(result);
-            
-        } catch (Exception e) {
-            System.debug('Field test error: ' + e.getMessage());
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('success', false);
-            result.put('message', e.getMessage());
-            
-            return JSON.serialize(result);
+    private static String handleDmlException(DmlException e) {
+        DKEDU_DebugUtils.log('handleDmlException', e);
+        
+        String errorMsg = 'Database error: ';
+        if (e.getNumDml() > 0) {
+            errorMsg += e.getDmlMessage(0);
+        } else {
+            errorMsg += e.getMessage();
         }
+        
+        Map<String, Object> result = new Map<String, Object>{
+            'success' => false,
+            'message' => errorMsg,
+            'errorType' => 'DmlException'
+        };
+        
+        return JSON.serialize(result);
     }
     
     /**
-     * @description Test target creation functionality
-     * @return Test result
+     * @description Handle Aura handled exceptions
+     * @param e Aura handled exception to handle
+     * @return JSON error response
      */
-    @AuraEnabled
-    public static String testTargetCreation() {
-        try {
-            // 테스트용 AssessmentMaster 생성
-            AssessmentMaster__c testMaster = new AssessmentMaster__c(
-                Name = 'Test Master',
-                IsActive__c = true,
-                AssessmentStartDate__c = Date.today(),
-                AssessmentEndDate__c = Date.today().addDays(7),
-                Status__c = 'Waiting'
-            );
-            insert testMaster;
-            
-            // 테스트용 Target 데이터 - TargetName 제거
-            List<Object> testTargets = new List<Object>{
-                new Map<String, Object>{
-                    'contactId' => '003000000000000' // 더미 Contact ID
-                }
-            };
-            
-            // Target 생성 테스트
-            createAssessmentTargets(testMaster.Id, testTargets);
-            
-            return JSON.serialize(new Map<String, Object>{
-                'success' => true,
-                'masterId' => testMaster.Id,
-                'message' => 'Test target creation successful'
-            });
-            
-        } catch (Exception e) {
-            return JSON.serialize(new Map<String, Object>{
-                'success' => false,
-                'message' => e.getMessage(),
-                'stackTrace' => e.getStackTraceString()
-            });
-        }
+    private static String handleAuraException(AuraHandledException e) {
+        DKEDU_DebugUtils.log('handleAuraException', e);
+        
+        Map<String, Object> result = new Map<String, Object>{
+            'success' => false,
+            'message' => e.getMessage(),
+            'errorType' => 'AuraHandledException'
+        };
+        
+        return JSON.serialize(result);
+    }
+    
+    /**
+     * @description Handle general exceptions
+     * @param e General exception to handle
+     * @return JSON error response
+     */
+    private static String handleGeneralException(Exception e) {
+        DKEDU_DebugUtils.log('handleGeneralException', e);
+        
+        Map<String, Object> result = new Map<String, Object>{
+            'success' => false,
+            'message' => 'Unexpected error: ' + e.getMessage(),
+            'errorType' => 'GeneralException',
+            'errorTypeName' => e.getTypeName()
+        };
+        
+        return JSON.serialize(result);
     }
     
     /**
      * @description Get Assessment Master details by ID
      * @param masterId Assessment Master ID
      * @return Assessment Master with related data
+     * @throws AuraHandledException when retrieval fails
      */
     @AuraEnabled(cacheable=true)
     public static AssessmentMaster__c getAssessmentMasterDetails(Id masterId) {
         try {
-            return [
+            DKEDU_DebugUtils.log('getAssessmentMasterDetails - Start', masterId);
+            
+            AssessmentMaster__c master = [
                 SELECT Id, Name, IsActive__c, AssessmentStartDate__c, AssessmentEndDate__c,
                        AssessmentTemplate__c, AssessmentTemplate__r.Name,
                        GradeId__c, GradeId__r.Name,
@@ -613,8 +425,12 @@ public with sharing class DKEDU_AssessmentMasterController {
                 WHERE Id = :masterId 
                 LIMIT 1
             ];
+            
+            DKEDU_DebugUtils.log('getAssessmentMasterDetails - Success', master);
+            return master;
+            
         } catch (Exception e) {
-            System.debug('Error in getAssessmentMasterDetails: ' + e.getMessage());
+            DKEDU_DebugUtils.log('getAssessmentMasterDetails - Exception', e);
             throw new AuraHandledException('Failed to retrieve assessment master details: ' + e.getMessage());
         }
     }
@@ -623,19 +439,26 @@ public with sharing class DKEDU_AssessmentMasterController {
      * @description Get Assessment Targets for a Master
      * @param masterId Assessment Master ID
      * @return List of Assessment Targets
+     * @throws AuraHandledException when retrieval fails
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentTarget__c> getAssessmentTargets(Id masterId) {
         try {
-            return [
+            DKEDU_DebugUtils.log('getAssessmentTargets - Start', masterId);
+            
+            List<AssessmentTarget__c> targets = [
                 SELECT Id, AssessmentMaster__c, ContactId__c
                 FROM AssessmentTarget__c 
                 WHERE AssessmentMaster__c = :masterId
                 ORDER BY CreatedDate ASC
-                LIMIT 1000
+                LIMIT :QUERY_LIMIT
             ];
+            
+            DKEDU_DebugUtils.log('getAssessmentTargets - Success', targets.size());
+            return targets;
+            
         } catch (Exception e) {
-            System.debug('Error in getAssessmentTargets: ' + e.getMessage());
+            DKEDU_DebugUtils.log('getAssessmentTargets - Exception', e);
             throw new AuraHandledException('Failed to retrieve assessment targets: ' + e.getMessage());
         }
     }
