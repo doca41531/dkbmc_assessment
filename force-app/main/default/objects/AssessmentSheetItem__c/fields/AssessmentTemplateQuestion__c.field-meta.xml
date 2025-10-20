@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AssessmentTemplateQuestion__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Assessment Template Question</label>
+    <referenceTo>AssessmentTemplateQuestion__c</referenceTo>
+    <relationshipLabel>Assessment Sheet Item</relationshipLabel>
+    <relationshipName>Assessment_Sheet_Item</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

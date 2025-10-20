@@ -4,9 +4,9 @@
  * @author            : developer@company.com
  * @group             : DKEDU Components  
  * @created date      : 2025-01-15
- * @last modified on  : 2025-10-17
+ * @last modified on  : 2025-10-20
  * @last modified by  : mingyu.park@dkbmc.com
- * @version           : 2.0.0
+ * @version           : 2.1.0
  */
 -->
 <template>
@@ -283,7 +283,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Assessment Type -->
+                                <!-- Assessment Type (Select Box로 변경) -->
                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label" for="assessmentType">
@@ -291,54 +291,31 @@
                                             Assessment Type
                                         </label>
                                         <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container">
-                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" 
-                                                     aria-expanded={isAssessmentTypeDropdownOpen}
-                                                     aria-haspopup="listbox" 
-                                                     role="combobox">
-                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                        <input type="text" 
-                                                               class="slds-input slds-combobox__input" 
-                                                               id="assessmentType"
-                                                               placeholder="Search types..."
-                                                               value={assessmentTypeSearchTerm}
-                                                               oninput={handleAssessmentTypeSearch}
-                                                               onfocus={handleAssessmentTypeDropdownFocus}
-                                                               onblur={handleAssessmentTypeDropdownBlur}
-                                                               autocomplete="off" 
-                                                               role="textbox" />
-                                                        <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
-                                                        </span>
-                                                    </div>
-                                                    <template lwc:if={isAssessmentTypeDropdownOpen}>
-                                                        <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
-                                                             role="listbox"
-                                                             onmouseenter={handleDropdownMouseEnter}
-                                                             onmouseleave={handleDropdownMouseLeave}>
-                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                                <template for:each={filteredAssessmentTypeOptions} for:item="type">
-                                                                    <li key={type.value} role="presentation" class="slds-listbox__item">
-                                                                        <div class="slds-media slds-listbox__option slds-listbox__option_entity" 
-                                                                             role="option"
-                                                                             data-type-value={type.value}
-                                                                             onclick={selectAssessmentType}>
-                                                                            <span class="slds-media__body">
-                                                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{type.label}</span>
-                                                                            </span>
-                                                                        </div>
-                                                                    </li>
-                                                                </template>
-                                                            </ul>
-                                                        </div>
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" 
+                                                        id="assessmentType"
+                                                        data-field="assessmentType"
+                                                        onchange={handleAssessmentTypeSelectChange}>
+                                                    <option value="">Choose an assessment type...</option>
+                                                    <template for:each={assessmentTypeOptions} for:item="assessmentType">
+                                                        <option key={assessmentType.value} 
+                                                                value={assessmentType.value}
+                                                                selected={selectedAssessmentType}>
+                                                            {assessmentType.label}
+                                                        </option>
                                                     </template>
-                                                </div>
+                                                </select>
                                             </div>
                                         </div>
+                                        <template lwc:if={selectedAssessmentType}>
+                                            <div class="slds-form-element__help">
+                                                Selected: {selectedAssessmentTypeLabel}
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
 
-                                <!-- Assign Type -->
+                                <!-- Assign Type (Select Box로 변경) -->
                                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                                     <div class="slds-form-element slds-m-bottom_medium">
                                         <label class="slds-form-element__label" for="assignType">
@@ -346,50 +323,27 @@
                                             Assign Type
                                         </label>
                                         <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container">
-                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" 
-                                                     aria-expanded={isAssignTypeDropdownOpen}
-                                                     aria-haspopup="listbox" 
-                                                     role="combobox">
-                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                        <input type="text" 
-                                                               class="slds-input slds-combobox__input" 
-                                                               id="assignType"
-                                                               placeholder="Search assign types..."
-                                                               value={assignTypeSearchTerm}
-                                                               oninput={handleAssignTypeSearch}
-                                                               onfocus={handleAssignTypeDropdownFocus}
-                                                               onblur={handleAssignTypeDropdownBlur}
-                                                               autocomplete="off" 
-                                                               role="textbox" />
-                                                        <span class="slds-icon_container slds-input__icon slds-input__icon_right">
-                                                            <lightning-icon icon-name="utility:search" size="x-small"></lightning-icon>
-                                                        </span>
-                                                    </div>
-                                                    <template lwc:if={isAssignTypeDropdownOpen}>
-                                                        <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" 
-                                                             role="listbox"
-                                                             onmouseenter={handleDropdownMouseEnter}
-                                                             onmouseleave={handleDropdownMouseLeave}>
-                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                                <template for:each={filteredAssignTypeOptions} for:item="assignType">
-                                                                    <li key={assignType.value} role="presentation" class="slds-listbox__item">
-                                                                        <div class="slds-media slds-listbox__option slds-listbox__option_entity" 
-                                                                             role="option"
-                                                                             data-assign-type-value={assignType.value}
-                                                                             onclick={selectAssignType}>
-                                                                            <span class="slds-media__body">
-                                                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{assignType.label}</span>
-                                                                            </span>
-                                                                        </div>
-                                                                    </li>
-                                                                </template>
-                                                            </ul>
-                                                        </div>
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" 
+                                                        id="assignType"
+                                                        data-field="assignType"
+                                                        onchange={handleAssignTypeSelectChange}>
+                                                    <option value="">Choose an assign type...</option>
+                                                    <template for:each={assignTypeOptions} for:item="assignType">
+                                                        <option key={assignType.value} 
+                                                                value={assignType.value}
+                                                                selected={selectedAssignType}>
+                                                            {assignType.label}
+                                                        </option>
                                                     </template>
-                                                </div>
+                                                </select>
                                             </div>
                                         </div>
+                                        <template lwc:if={selectedAssignType}>
+                                            <div class="slds-form-element__help">
+                                                Selected: {selectedAssignTypeLabel}
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -521,7 +475,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </template>
+                                                            </template>
                                         </div>
                                     </div>
                                 </template>
@@ -544,7 +498,7 @@
                                     <div class="slds-spinner__dot-b"></div>
                                 </div>
                             </span>
-                        </template>
+                                                        </template>
                         {labels.save}
                     </button>
                 </footer>

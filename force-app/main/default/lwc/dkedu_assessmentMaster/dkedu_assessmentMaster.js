@@ -3,9 +3,9 @@
  * @author            : developer@company.com
  * @group             : DKEDU Components  
  * @created date      : 2025-01-15
- * @last modified on  : 2025-10-17
+ * @last modified on  : 2025-10-20
  * @last modified by  : mingyu.park@dkbmc.com
- * @version           : 2.0.0
+ * @version           : 2.1.0
  */
 
 import { LightningElement, track, api, wire } from 'lwc';
@@ -24,10 +24,6 @@ import createAssessmentMaster from '@salesforce/apex/DKEDU_AssessmentMasterContr
 import ASSESSMENT_MASTER_OBJECT from '@salesforce/schema/AssessmentMaster__c';
 import ASSESSMENT_TYPE_FIELD from '@salesforce/schema/AssessmentMaster__c.AssessmentType__c';
 import ASSIGN_TYPE_FIELD from '@salesforce/schema/AssessmentMaster__c.AssignType__c';
-
-// Custom Labels removed for deployment - using hardcoded strings
-// TODO: Create Custom Labels and replace hardcoded strings
-// DKEDU_AM_LBL_SAVE, DKEDU_AM_LBL_CANCEL, DKEDU_AM_MSG_SUCCESS, DKEDU_AM_MSG_VALIDATIONERROR
 
 export default class DkeduAssessmentMaster extends NavigationMixin(LightningElement) {
     
@@ -62,18 +58,14 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
     @track _selectedAssessmentType = '';
     @track _selectedAssignType = '';
     
-    // Search state for comboboxes
+    // Search state for comboboxes (Assessment Type 검색 관련 제거)
     @track templateSearchTerm = '';
     @track gradeSearchTerm = '';
-    @track assessmentTypeSearchTerm = '';
-    @track assignTypeSearchTerm = '';
     @track contactSearchTerm = '';
     
-    // Dropdown states
+    // Dropdown states (Assessment Type 드롭다운 상태 제거)
     @track isTemplateDropdownOpen = false;
     @track isGradeDropdownOpen = false;
-    @track isAssessmentTypeDropdownOpen = false;
-    @track isAssignTypeDropdownOpen = false;
     @track isContactDropdownOpen = false;
     
     // Options arrays
@@ -82,11 +74,9 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
     @track assessmentTypeOptions = [];
     @track assignTypeOptions = [];
     
-    // Filtered options
+    // Filtered options (Assessment Type 필터링 옵션 제거)
     @track filteredTemplateOptions = [];
     @track filteredGradeOptions = [];
-    @track filteredAssessmentTypeOptions = [];
-    @track filteredAssignTypeOptions = [];
     
     // Contact search specific
     @track selectedTargets = [];
@@ -209,7 +199,7 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
                     label: option.label,
                     value: option.value
                 }));
-                this.filteredAssessmentTypeOptions = [...this.assessmentTypeOptions];
+                // Assessment Type은 Select Box이므로 필터링 옵션 불필요
             } else if (error) {
                 this.handleError(error, 'assessmentTypePicklistHandler');
             }
@@ -226,7 +216,6 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
                     label: option.label,
                     value: option.value
                 }));
-                this.filteredAssignTypeOptions = [...this.assignTypeOptions];
             } else if (error) {
                 this.handleError(error, 'assignTypePicklistHandler');
             }
@@ -250,6 +239,36 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
     
     get selectedTargetCount() {
         return this.selectedTargets.length;
+    }
+    
+    get selectedAssessmentTypeLabel() {
+        try {
+            if (this._selectedAssessmentType) {
+                const selectedOption = this.assessmentTypeOptions.find(
+                    option => option.value === this._selectedAssessmentType
+                );
+                return selectedOption ? selectedOption.label : '';
+            }
+            return '';
+        } catch (error) {
+            this.handleError(error, 'selectedAssessmentTypeLabel');
+            return '';
+        }
+    }
+    
+    get selectedAssignTypeLabel() {
+        try {
+            if (this._selectedAssignType) {
+                const selectedOption = this.assignTypeOptions.find(
+                    option => option.value === this._selectedAssignType
+                );
+                return selectedOption ? selectedOption.label : '';
+            }
+            return '';
+        } catch (error) {
+            this.handleError(error, 'selectedAssignTypeLabel');
+            return '';
+        }
     }
     
     // Utility methods following DK Lab standards
@@ -315,15 +334,11 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
             this.gradeSearchTerm = '';
             this.isGradeDropdownOpen = false;
             
-            // Reset assessment type related
+            // Reset assessment type related (Select Box용으로 수정)
             this._selectedAssessmentType = '';
-            this.assessmentTypeSearchTerm = '';
-            this.isAssessmentTypeDropdownOpen = false;
             
-            // Reset assign type related
+            // Reset assign type related (Select Box용으로 수정)
             this._selectedAssignType = '';
-            this.assignTypeSearchTerm = '';
-            this.isAssignTypeDropdownOpen = false;
             
             // Reset contact related
             this.selectedTargets = [];
@@ -336,11 +351,9 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
             this.isLoading = false;
             this._formData = {};
             
-            // Reset filtered options
+            // Reset filtered options (Assessment Type은 Select Box이므로 필터링 옵션 불필요)
             this.filteredTemplateOptions = [...this.templateOptions];
             this.filteredGradeOptions = [...this.gradeOptions];
-            this.filteredAssessmentTypeOptions = [...this.assessmentTypeOptions];
-            this.filteredAssignTypeOptions = [...this.assignTypeOptions];
             
             this.log('Form data reset completed');
         } catch (error) {
@@ -376,7 +389,18 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
                 }
             });
             
-            // Reset dropdown states
+            // Reset select boxes (Assign Type)
+            const selects = this.template.querySelectorAll('select[data-field]');
+            selects.forEach(select => {
+                try {
+                    select.value = '';
+                    select.selectedIndex = 0;
+                } catch (e) {
+                    this.log('Error resetting select', e);
+                }
+            });
+            
+            // Reset dropdown states (검색 combobox들만)
             const dropdowns = this.template.querySelectorAll('.slds-combobox');
             dropdowns.forEach(dropdown => {
                 try {
@@ -407,8 +431,6 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
                 selectedAssignType: this._selectedAssignType,
                 templateSearchTerm: this.templateSearchTerm,
                 gradeSearchTerm: this.gradeSearchTerm,
-                assessmentTypeSearchTerm: this.assessmentTypeSearchTerm,
-                assignTypeSearchTerm: this.assignTypeSearchTerm,
                 selectedTemplate: this._selectedTemplate,
                 selectedGrade: this._selectedGrade
             };
@@ -523,6 +545,18 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
             const isActiveCheckbox = this.template.querySelector('[data-field="isActive"]');
             if (isActiveCheckbox) {
                 isActiveCheckbox.checked = this._isActive;
+            }
+            
+            // Assign Type Select Box 동기화
+            const assignTypeSelect = this.template.querySelector('select[data-field="assignType"]');
+            if (assignTypeSelect) {
+                assignTypeSelect.value = this._selectedAssignType;
+            }
+            
+            // Assessment Type Select Box 동기화
+            const assessmentTypeSelect = this.template.querySelector('select[data-field="assessmentType"]');
+            if (assessmentTypeSelect) {
+                assessmentTypeSelect.value = this._selectedAssessmentType;
             }
             
             this.log('Form values synchronized');
@@ -678,6 +712,322 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
         } catch (error) {
             this.handleError(error, 'handleTextareaChange');
         }
+    }
+    
+    // Template search handlers
+    handleTemplateSearch(event) {
+        try {
+            const searchTerm = event.target.value.toLowerCase();
+            this.templateSearchTerm = searchTerm;
+            
+            this.log('Template search term:', searchTerm);
+            
+            // 검색어에 따른 필터링
+            if (searchTerm.length === 0) {
+                this.filteredTemplateOptions = [...this.templateOptions];
+            } else {
+                this.filteredTemplateOptions = this.templateOptions.filter(template => {
+                    const nameMatch = template.label.toLowerCase().includes(searchTerm);
+                    const descMatch = template.description ? 
+                        template.description.toLowerCase().includes(searchTerm) : false;
+                    return nameMatch || descMatch;
+                });
+            }
+            
+            // 드롭다운 상태 관리
+            this.isTemplateDropdownOpen = true;
+            
+            this.log('Filtered template options:', this.filteredTemplateOptions.length);
+        } catch (error) {
+            this.handleError(error, 'handleTemplateSearch');
+        }
+    }
+
+    handleTemplateDropdownFocus(event) {
+        try {
+            this.isTemplateDropdownOpen = true;
+            // 포커스 시 전체 옵션 표시
+            if (this.filteredTemplateOptions.length === 0) {
+                this.filteredTemplateOptions = [...this.templateOptions];
+            }
+        } catch (error) {
+            this.handleError(error, 'handleTemplateDropdownFocus');
+        }
+    }
+
+    handleTemplateDropdownBlur(event) {
+        try {
+            // 마우스가 드롭다운 위에 있으면 닫지 않음
+            if (!this._isMouseOverDropdown) {
+                setTimeout(() => {
+                    this.isTemplateDropdownOpen = false;
+                }, DkeduAssessmentMaster.DROPDOWN_CLOSE_DELAY);
+            }
+        } catch (error) {
+            this.handleError(error, 'handleTemplateDropdownBlur');
+        }
+    }
+
+    selectTemplate(event) {
+        try {
+            const templateId = event.currentTarget.dataset.templateId;
+            const selectedTemplate = this.templateOptions.find(template => template.value === templateId);
+            
+            if (selectedTemplate) {
+                this._selectedTemplate = selectedTemplate;
+                this._selectedTemplateId = templateId;
+                this.templateSearchTerm = selectedTemplate.label;
+                this.isTemplateDropdownOpen = false;
+                
+                this.log('Template selected:', selectedTemplate);
+            }
+        } catch (error) {
+            this.handleError(error, 'selectTemplate');
+        }
+    }
+
+    // Grade search handlers
+    handleGradeSearch(event) {
+        try {
+            const searchTerm = event.target.value.toLowerCase();
+            this.gradeSearchTerm = searchTerm;
+            
+            this.log('Grade search term:', searchTerm);
+            
+            if (searchTerm.length === 0) {
+                this.filteredGradeOptions = [...this.gradeOptions];
+            } else {
+                this.filteredGradeOptions = this.gradeOptions.filter(grade => 
+                    grade.label.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            this.isGradeDropdownOpen = true;
+            
+            this.log('Filtered grade options:', this.filteredGradeOptions.length);
+        } catch (error) {
+            this.handleError(error, 'handleGradeSearch');
+        }
+    }
+
+    handleGradeDropdownFocus(event) {
+        try {
+            this.isGradeDropdownOpen = true;
+            if (this.filteredGradeOptions.length === 0) {
+                this.filteredGradeOptions = [...this.gradeOptions];
+            }
+        } catch (error) {
+            this.handleError(error, 'handleGradeDropdownFocus');
+        }
+    }
+
+    handleGradeDropdownBlur(event) {
+        try {
+            if (!this._isMouseOverDropdown) {
+                setTimeout(() => {
+                    this.isGradeDropdownOpen = false;
+                }, DkeduAssessmentMaster.DROPDOWN_CLOSE_DELAY);
+            }
+        } catch (error) {
+            this.handleError(error, 'handleGradeDropdownBlur');
+        }
+    }
+
+    selectGrade(event) {
+        try {
+            const gradeId = event.currentTarget.dataset.gradeId;
+            const selectedGrade = this.gradeOptions.find(grade => grade.value === gradeId);
+            
+            if (selectedGrade) {
+                this._selectedGrade = selectedGrade;
+                this._selectedGradeId = gradeId;
+                this.gradeSearchTerm = selectedGrade.label;
+                this.isGradeDropdownOpen = false;
+                
+                this.log('Grade selected:', selectedGrade);
+            }
+        } catch (error) {
+            this.handleError(error, 'selectGrade');
+        }
+    }
+
+    // Assessment Type Select Box handler
+    handleAssessmentTypeSelectChange(event) {
+        try {
+            // Prevent default behavior
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const assessmentTypeValue = event.target.value;
+            
+            this.log(`handleAssessmentTypeSelectChange - assessmentType:`, assessmentTypeValue);
+            
+            // Backup data
+            this.backupFormData();
+            
+            // Update selected assessment type
+            this._selectedAssessmentType = assessmentTypeValue;
+            
+            this.log(`Assessment Type updated to:`, this._selectedAssessmentType);
+            
+        } catch (error) {
+            this.handleError(error, 'handleAssessmentTypeSelectChange');
+        }
+    }
+
+    // Assign Type Select Box handler
+    handleAssignTypeSelectChange(event) {
+        try {
+            // Prevent default behavior
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const assignTypeValue = event.target.value;
+            
+            this.log(`handleAssignTypeSelectChange - assignType:`, assignTypeValue);
+            
+            // Backup data
+            this.backupFormData();
+            
+            // Update selected assign type
+            this._selectedAssignType = assignTypeValue;
+            
+            this.log(`Assign Type updated to:`, this._selectedAssignType);
+            
+            // Manual assign type일 때 Contact 검색 섹션을 표시하기 위해 re-render
+            if (assignTypeValue === DkeduAssessmentMaster.ASSIGN_TYPE_MANUAL) {
+                // Contact 관련 데이터 초기화
+                this.selectedTargets = [];
+                this.searchResults = [];
+                this.contactSearchTerm = '';
+                this.hasSearchedContacts = false;
+                this.isContactDropdownOpen = false;
+            }
+            
+        } catch (error) {
+            this.handleError(error, 'handleAssignTypeSelectChange');
+        }
+    }
+
+    // Contact search handlers
+    handleContactSearch(event) {
+        try {
+            const searchTerm = event.target.value;
+            this.contactSearchTerm = searchTerm;
+            
+            this.log('Contact search term:', searchTerm);
+            
+            // 기존 타임아웃 클리어
+            if (this._searchTimeout) {
+                clearTimeout(this._searchTimeout);
+            }
+            
+            // 검색어가 2자 이상일 때만 검색
+            if (searchTerm.length >= 2) {
+                this._searchTimeout = setTimeout(() => {
+                    this.performContactSearch(searchTerm);
+                }, DkeduAssessmentMaster.SEARCH_DEBOUNCE_DELAY);
+            } else {
+                this.searchResults = [];
+                this.hasSearchedContacts = false;
+                this.isContactDropdownOpen = false;
+            }
+        } catch (error) {
+            this.handleError(error, 'handleContactSearch');
+        }
+    }
+
+    async performContactSearch(searchTerm) {
+        try {
+            this.log('Performing contact search for:', searchTerm);
+            
+            const results = await searchContacts({ searchTerm: searchTerm });
+            
+            this.searchResults = results.map(contact => ({
+                id: contact.Id,
+                name: contact.Name,
+                email: contact.Email || '',
+                account: contact.Account?.Name || ''
+            }));
+            
+            this.hasSearchedContacts = true;
+            this.isContactDropdownOpen = true;
+            
+            this.log('Contact search results:', this.searchResults.length);
+        } catch (error) {
+            this.handleError(error, 'performContactSearch');
+            this.searchResults = [];
+            this.hasSearchedContacts = true;
+            this.isContactDropdownOpen = false;
+        }
+    }
+
+    handleContactDropdownFocus(event) {
+        try {
+            if (this.hasSearchResults) {
+                this.isContactDropdownOpen = true;
+            }
+        } catch (error) {
+            this.handleError(error, 'handleContactDropdownFocus');
+        }
+    }
+
+    handleContactDropdownBlur(event) {
+        try {
+            if (!this._isMouseOverDropdown) {
+                setTimeout(() => {
+                    this.isContactDropdownOpen = false;
+                }, DkeduAssessmentMaster.DROPDOWN_CLOSE_DELAY);
+            }
+        } catch (error) {
+            this.handleError(error, 'handleContactDropdownBlur');
+        }
+    }
+
+    selectContact(event) {
+        try {
+            const contactId = event.currentTarget.dataset.contactId;
+            const selectedContact = this.searchResults.find(contact => contact.id === contactId);
+            
+            if (selectedContact) {
+                // 중복 선택 방지
+                const alreadySelected = this.selectedTargets.find(target => target.id === contactId);
+                if (!alreadySelected) {
+                    this.selectedTargets = [...this.selectedTargets, selectedContact];
+                    this.log('Contact selected:', selectedContact);
+                } else {
+                    this.showToast('Warning', 'This contact is already selected.', 'warning');
+                }
+                
+                // 검색 초기화
+                this.contactSearchTerm = '';
+                this.searchResults = [];
+                this.isContactDropdownOpen = false;
+                this.hasSearchedContacts = false;
+            }
+        } catch (error) {
+            this.handleError(error, 'selectContact');
+        }
+    }
+
+    handleRemoveTarget(event) {
+        try {
+            const contactId = event.currentTarget.dataset.contactId;
+            this.selectedTargets = this.selectedTargets.filter(target => target.id !== contactId);
+            
+            this.log('Target removed:', contactId);
+        } catch (error) {
+            this.handleError(error, 'handleRemoveTarget');
+        }
+    }
+
+    // 드롭다운 마우스 이벤트 핸들러
+    handleDropdownMouseEnter(event) {
+        this._isMouseOverDropdown = true;
+    }
+
+    handleDropdownMouseLeave(event) {
+        this._isMouseOverDropdown = false;
     }
     
     // Validation methods
@@ -901,9 +1251,6 @@ export default class DkeduAssessmentMaster extends NavigationMixin(LightningElem
             this.handleError(error, 'resetComponent');
         }
     }
-    
-    // Template search and dropdown methods would be added here
-    // Following the same error handling pattern...
     
     // Debug methods
     @api

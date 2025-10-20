@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AssessmentGrade__c</fullName>
+    <label>Assessment Grade</label>
+    <referenceTo>AssessmentGrade__c</referenceTo>
+    <relationshipLabel>Assessment Grade Item</relationshipLabel>
+    <relationshipName>Assessment_Grade_Item</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

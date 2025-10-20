@@ -1,0 +1,11 @@
+<!-- DeployAssessmentButton.cmp -->
+<aura:component controller="DeployAssessmentController" 
+                implements="flexipage:availableForRecordHome,force:hasRecordId">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="isDeploying" type="Boolean" default="false"/>
+    
+    <lightning:button label="시험지 배포" 
+                     variant="brand"
+                     onclick="{!c.deployAssessment}"
+                     disabled="{!v.isDeploying}"/>
+</aura:component>
