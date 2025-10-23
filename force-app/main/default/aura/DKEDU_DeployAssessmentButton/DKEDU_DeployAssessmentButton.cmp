@@ -1,11 +1,18 @@
-<!-- DeployAssessmentButton.cmp -->
-<aura:component controller="DeployAssessmentController" 
-                implements="flexipage:availableForRecordHome,force:hasRecordId">
+<!--
+  @description       : 
+  @author            : mingyu.park@dkbmc.com
+  @group             : 
+  @last modified on  : 2025-10-20
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<aura:component controller="DKEDU_DeployAssessmentController"
+                implements="force:lightningQuickAction,force:hasRecordId">
     <aura:attribute name="recordId" type="String"/>
-    <aura:attribute name="isDeploying" type="Boolean" default="false"/>
     
-    <lightning:button label="시험지 배포" 
-                     variant="brand"
-                     onclick="{!c.deployAssessment}"
-                     disabled="{!v.isDeploying}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.deployAssessment}"/>
+    
+    <div class="slds-align_absolute-center">
+        <lightning:spinner alternativeText="시험지 생성 중..." size="medium" />
+        <p>시험지를 생성하고 있습니다...</p>
+    </div>
 </aura:component>

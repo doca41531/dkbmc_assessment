@@ -2,17 +2,8 @@
 
 /* 기존 스타일들 유지 */
 .slds-form-element {
-    padding-left: 1rem;
-    padding-right: 1.75rem;
     margin-bottom: 1rem;
     overflow: visible;
-}
-
-@media (max-width: 600px) {
-    .slds-form-element {
-        padding-left: 0.75rem;
-        padding-right: 1.5rem;
-    }
 }
 
 .slds-input,

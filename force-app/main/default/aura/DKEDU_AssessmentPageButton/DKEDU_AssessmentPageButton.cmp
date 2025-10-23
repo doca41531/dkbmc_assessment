@@ -1,0 +1,23 @@
+<!--
+  @description       : Assessment Page Button for Record Page
+  @author            : mingyu.park@dkbmc.com
+  @group             : 
+  @last modified on  : 2025-10-21
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-p-around_medium">
+        <div class="slds-text-align_center">
+            <lightning:spinner alternativeText="평가 페이지로 이동 중..." size="medium"/>
+            <p class="slds-text-body_regular slds-m-top_medium">
+                평가 페이지로 이동 중입니다...
+            </p>
+        </div>
+    </div>
+</aura:component>

@@ -2,18 +2,9 @@
 
 /* Form element base styling with improved state management */
 .slds-form-element {
-    padding-left: 1rem;
-    padding-right: 1.75rem;
     margin-bottom: 1rem;
     overflow: visible;
     position: relative;
-}
-
-@media (max-width: 600px) {
-    .slds-form-element {
-        padding-left: 0.75rem;
-        padding-right: 1.5rem;
-    }
 }
 
 /* Input field styling with focus states */
@@ -433,11 +424,6 @@ input[type="date"][data-field]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 480px) {
-    .slds-form-element {
-        padding-left: 0.5rem;
-        padding-right: 1rem;
-    }
-    
     .selected-targets-container .slds-col {
         width: 100%;
         margin-bottom: 0.5rem;

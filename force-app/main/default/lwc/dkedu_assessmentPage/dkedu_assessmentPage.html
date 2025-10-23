@@ -1,3 +1,105 @@
+<!--
+  @description       : 
+  @author            : mingyu.park@dkbmc.com
+  @group             : 
+  @last modified on  : 2025-10-21
+  @last modified by  : mingyu.park@dkbmc.com
+-->
 <template>
-    
+    <div class="assessment-container">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="로딩 중..." size="medium"></lightning-spinner>
+        </template>
+        
+        <template if:true={assessmentData}>
+            <div class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_medium">평가 진행</span>
+                            </h2>
+                            <p class="slds-text-body_small">
+                                섹션 {currentSectionIndex} / {totalSections}
+                            </p>
+                        </div>
+                    </header>
+                </div>
+                
+                <div class="slds-card__body slds-card__body_inner">
+                    <template if:true={currentSection}>
+                        <h3 class="slds-text-heading_small slds-m-bottom_medium">
+                            {currentSection.Name}
+                        </h3>
+                        
+                        <template for:each={currentSection.items} for:item="item" for:index="itemIndex">
+                            <div key={item.Id} class="slds-form-element slds-m-bottom_medium">
+                                <label class="slds-form-element__label" for={item.Id}>
+                                    <span class="slds-text-body_regular">
+                                        문제 {itemIndex} : {item.questionContent}
+                                    </span>
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <template if:true={item.isTextType}>
+                                        <lightning-textarea
+                                            name={item.Id}
+                                            value={item.response}
+                                            onchange={handleResponse}
+                                            placeholder="답안을 입력하세요">
+                                        </lightning-textarea>
+                                    </template>
+                                    
+                                    <template if:false={item.isTextType}>
+                                        <lightning-input
+                                            name={item.Id}
+                                            value={item.response}
+                                            onchange={handleResponse}
+                                            placeholder="답안을 입력하세요">
+                                        </lightning-input>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+                
+                <footer class="slds-card__footer">
+                    <div class="slds-grid slds-grid_align-spread">
+                        <lightning-button
+                            label="이전"
+                            onclick={previousSection}
+                            disabled={isFirstSection}
+                            variant="neutral">
+                        </lightning-button>
+                        
+                        <div class="slds-grid slds-grid_align-end">
+                            <template if:false={isLastSection}>
+                                <lightning-button
+                                    label="다음"
+                                    onclick={nextSection}
+                                    variant="brand">
+                                </lightning-button>
+                            </template>
+                            
+                            <template if:true={isLastSection}>
+                                <lightning-button
+                                    label="제출"
+                                    onclick={submitAssessment}
+                                    variant="success"
+                                    class="slds-m-left_small">
+                                </lightning-button>
+                            </template>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </template>
+        
+        <template if:true={errorMessage}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <span class="slds-assistive-text">error</span>
+                <h2>{errorMessage}</h2>
+            </div>
+        </template>
+    </div>
 </template>

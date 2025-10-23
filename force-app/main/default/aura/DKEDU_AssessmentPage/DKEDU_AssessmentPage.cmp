@@ -18,25 +18,23 @@
     
     <div class="assessment-container">
         <aura:if isTrue="{!not(empty(v.assessmentData))}">
-            <!-- 현재 섹션 표시 -->
             <div class="current-section">
                 <h2>{!v.currentSection.Name}</h2>
                 
-                <!-- 현재 섹션의 문항들 표시 -->
                 <aura:iteration items="{!v.currentSection.items}" var="item" indexVar="itemIdx">
                     <div class="question-item">
                         <h3>문제 {!itemIdx + 1}</h3>
                         <p>{!item.questionContent}</p>
                         
-                        <lightning:input name="{!item.Id}"
+                        <!-- 동적 value 제거 -->
+                        <lightning:input aura:id="{!item.Id}"
+                                       name="{!item.Id}"
                                        label="답안을 입력하세요"
-                                       value="{!v.responses[item.Id]}"
                                        onchange="{!c.handleResponse}"/>
                     </div>
                 </aura:iteration>
             </div>
             
-            <!-- 네비게이션 버튼 -->
             <div class="navigation-buttons">
                 <lightning:button label="이전" 
                                 onclick="{!c.previousSection}"

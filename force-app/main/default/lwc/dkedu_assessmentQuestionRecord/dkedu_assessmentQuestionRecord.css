@@ -387,9 +387,3 @@
     overflow: visible !important;
     position: relative !important;
 }
-
-/* Modal content should not clip any child elements */
-.slds-modal__content,
-.slds-modal__content section {
-    overflow: visible !important;
-}

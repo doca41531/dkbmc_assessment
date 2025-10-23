@@ -5,28 +5,27 @@
  * @last modified on  : 2025-10-20
  * @last modified by  : mingyu.park@dkbmc.com
 **/
-// AssessmentPageHelper.js
 ({
-// DKEDU_AssessmentPageController.js - Helper의 loadAssessmentData 콜백에서
-loadAssessmentData: function(component, sheetId) {
-    var action = component.get("c.getAssessmentData");
-    action.setParams({ sheetId: sheetId });
-    
-    action.setCallback(this, function(response) {
-        var state = response.getState();
-        if (state === "SUCCESS") {
-            var data = response.getReturnValue();
-            component.set("v.assessmentData", data);
-            
-            // 첫 번째 섹션을 현재 섹션으로 설정
-            if (data.sections && data.sections.length > 0) {
-                component.set("v.currentSection", data.sections[0]);
+    loadAssessmentData: function(component, sheetId) {
+        var action = component.get("c.getAssessmentData");
+        action.setParams({ sheetId: sheetId });
+        
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var data = response.getReturnValue();
+                component.set("v.assessmentData", data);
+                
+                if (data.sections && data.sections.length > 0) {
+                    component.set("v.currentSection", data.sections[0]);
+                }
+            } else {
+                this.showToast("오류", "시험 데이터 로드 실패", "error");
             }
-        }
-    });
-    
-    $A.enqueueAction(action);
-},
+        });
+        
+        $A.enqueueAction(action);
+    },
     
     saveResponse: function(component, itemId, answer) {
         var action = component.get("c.saveResponse");
@@ -54,7 +53,6 @@ loadAssessmentData: function(component, sheetId) {
             var state = response.getState();
             if (state === "SUCCESS") {
                 this.showToast("성공", "시험이 제출되었습니다", "success");
-                // 결과 페이지로 이동
                 window.location.href = '/assessment-result?sheetId=' + sheetId;
             } else {
                 this.showToast("오류", "제출 실패", "error");
@@ -62,6 +60,21 @@ loadAssessmentData: function(component, sheetId) {
         });
         
         $A.enqueueAction(action);
+    },
+    
+    loadSectionResponses: function(component, sectionIndex) {
+        var assessmentData = component.get("v.assessmentData");
+        var responses = component.get("v.responses");
+        var currentSection = assessmentData.sections[sectionIndex];
+        
+        if (currentSection && currentSection.items) {
+            currentSection.items.forEach(function(item) {
+                var inputCmp = component.find(item.Id);
+                if (inputCmp && responses[item.Id]) {
+                    inputCmp.set("v.value", responses[item.Id]);
+                }
+            });
+        }
     },
     
     showToast: function(title, message, type) {

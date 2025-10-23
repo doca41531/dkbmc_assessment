@@ -3,7 +3,7 @@
  * @author            : developer@company.com
  * @group             : DKEDU Controllers
  * @created date      : 2025-01-15
- * @last modified on  : 2025-10-17
+ * @last modified on  : 2025-10-20
  * @last modified by  : mingyu.park@dkbmc.com
  * @version           : 2.0.0
  */
@@ -189,7 +189,7 @@ public with sharing class DKEDU_AssessmentMasterController {
         master.AssessmentEndDate__c = Date.valueOf((String) masterMap.get('endDate'));
         
         // Set lookup fields
-        master.AssessmentTemplate__c = (String) masterMap.get('assessmentTemplateId');
+        master.AssessmentTemplateId__c = (String) masterMap.get('assessmentTemplateId');
         master.GradeId__c = (String) masterMap.get('assessmentGradeId');
         
         // Set picklist fields
@@ -417,7 +417,7 @@ public with sharing class DKEDU_AssessmentMasterController {
             
             AssessmentMaster__c master = [
                 SELECT Id, Name, IsActive__c, AssessmentStartDate__c, AssessmentEndDate__c,
-                       AssessmentTemplate__c, AssessmentTemplate__r.Name,
+                       AssessmentTemplateId__c, AssessmentTemplateId__r.Name,
                        GradeId__c, GradeId__r.Name,
                        AssessmentType__c, AssignType__c, Description__c, Status__c,
                        CreatedDate, LastModifiedDate
