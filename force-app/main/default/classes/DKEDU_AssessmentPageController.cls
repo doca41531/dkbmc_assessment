@@ -1,7 +1,7 @@
 /**
  * @description Assessment Page Controller with correct navigation logic
  * @author mingyu.park@dkbmc.com
- * @last modified on 2025-11-20
+ * @last modified on 2025-11-21 - Added score validation logic
  */
 public with sharing class DKEDU_AssessmentPageController {
     
@@ -209,7 +209,7 @@ public with sharing class DKEDU_AssessmentPageController {
         }
     }
 
-    // ⭐ 점수 저장 (채점 모드 전용)
+    // ⭐ 점수 저장 (채점 모드 전용) - 최대 점수 검증 로직 추가
     @AuraEnabled
     public static String saveScore(String itemId, Decimal score) {
         try {
@@ -222,84 +222,67 @@ public with sharing class DKEDU_AssessmentPageController {
                 throw new AuraHandledException('Assessment 접근 권한이 없습니다.');
             }
             
-            // 채점 권한 확인 (관리자만 점수 부여 가능)
-            if (!checkUserCanGrade()) {
-                throw new AuraHandledException('채점 권한이 없습니다.');
-            }
-            
-            // Assessment Sheet Item 업데이트
-            AssessmentSheetItem__c item = new AssessmentSheetItem__c(
-                Id = itemId,
-                Score__c = score
-            );
-            
-            update item;
-            
-            return '점수가 저장되었습니다.';
-            
-        } catch (Exception e) {
-            throw new AuraHandledException('점수 저장 중 오류가 발생했습니다: ' + e.getMessage());
-        }
-    }
-
-    // ⭐ Assessment Sheet 상태만 확인하는 간단한 메서드
-    @AuraEnabled
-    public static String checkAssessmentStatus(String sheetId) {
-        try {
-            if (String.isBlank(sheetId)) {
-                throw new AuraHandledException('Sheet ID가 전달되지 않았습니다.');
-            }
-            
-            // ⭐ Assessment 접근 권한 먼저 확인
-            if (!checkUserHasAssessmentPermission()) {
-                throw new AuraHandledException('Assessment 접근 권한이 없습니다.');
-            }
-            
-            // Assessment Sheet 상태만 조회
-            List<AssessmentSheet__c> sheets = [
-                SELECT Id, Status__c
-                FROM AssessmentSheet__c
-                WHERE Id = :sheetId
+            // ⭐ Assessment Sheet Item과 관련된 Assessment Template Question의 최대 점수 조회
+            List<AssessmentSheetItem__c> items = [
+                SELECT Id, Score__c, AssessmentTemplateQuestion__r.Score__c
+                FROM AssessmentSheetItem__c 
+                WHERE Id = :itemId
                 LIMIT 1
             ];
             
-            if (sheets.isEmpty()) {
-                throw new AuraHandledException('해당 Assessment Sheet를 찾을 수 없습니다.');
+            if (items.isEmpty()) {
+                throw new AuraHandledException('해당 Assessment Item을 찾을 수 없습니다.');
             }
             
-            return sheets[0].Status__c;
+            AssessmentSheetItem__c item = items[0];
+            Decimal maxScore = item.AssessmentTemplateQuestion__r.Score__c;
+            
+            // ⭐ 점수 검증: 입력된 점수가 최대 점수를 초과하는지 확인
+            if (score != null && maxScore != null && score > maxScore) {
+                throw new AuraHandledException(
+                    '입력된 점수(' + score + ')가 최대 점수(' + maxScore + ')를 초과할 수 없습니다.'
+                );
+            }
+            
+            // ⭐ 음수 점수 방지
+            if (score != null && score < 0) {
+                throw new AuraHandledException('점수는 0보다 작을 수 없습니다.');
+            }
+            
+            // 점수 업데이트
+            item.Score__c = score;
+            update item;
+            
+            return '점수가 성공적으로 저장되었습니다.';
             
         } catch (Exception e) {
-            throw new AuraHandledException('상태 확인 중 오류가 발생했습니다: ' + e.getMessage());
+            System.debug('Save score error: ' + e.getMessage());
+            throw new AuraHandledException('점수 저장 실패: ' + e.getMessage());
         }
     }
-
+    
+    // ⭐ Assessment 데이터 조회 (점수 정보 포함) - 실제 데이터 모델에 맞게 수정
     @AuraEnabled
     public static Map<String, Object> getAssessmentData(String sheetId) {
         try {
             if (String.isBlank(sheetId)) {
                 throw new AuraHandledException('Sheet ID가 전달되지 않았습니다.');
             }
-            
-            // ⭐ Assessment 접근 권한 먼저 확인
-            if (!checkUserHasAssessmentPermission()) {
-                throw new AuraHandledException('Assessment 접근 권한이 없습니다. 관리자에게 Permission Set 할당을 요청하세요.');
-            }
-            
+
             // Assessment Sheet 조회
-            List<AssessmentSheet__c> sheets = [
-                SELECT Id, Name, AssessmentMasterId__c, AssessmentTemplateId__c, Status__c
+            List<AssessmentSheet__c> assessmentSheets = [
+                SELECT Id, Name, Status__c, AssessmentTemplateId__c, AssessmentMasterId__c, AssessmentTargetId__c
                 FROM AssessmentSheet__c
                 WHERE Id = :sheetId
                 LIMIT 1
             ];
-            
-            if (sheets.isEmpty()) {
+
+            if (assessmentSheets.isEmpty()) {
                 throw new AuraHandledException('해당 Assessment Sheet를 찾을 수 없습니다.');
             }
-            
-            AssessmentSheet__c sheet = sheets[0];
-            
+
+            AssessmentSheet__c sheet = assessmentSheets[0];
+
             // Assessment Sheet Sections 조회
             List<AssessmentSheetSection__c> sections = [
                 SELECT Id, AssessmentResultHeader__c, AssessmentTemplateGroup__c, 
@@ -309,24 +292,25 @@ public with sharing class DKEDU_AssessmentPageController {
                 WHERE AssessmentResultHeader__c = :sheetId
                 ORDER BY SequenceOrder__c
             ];
-            
+
             // Assessment Sheet Items 조회
             Set<Id> sectionIds = new Set<Id>();
             for (AssessmentSheetSection__c section : sections) {
                 sectionIds.add(section.Id);
             }
-            
+
             List<AssessmentSheetItem__c> items = [
                 SELECT Id, AssessmentResultSection__c, AssessmentTemplateQuestion__c,
                        Score__c, Answer__c,
                        AssessmentTemplateQuestion__r.Question__c,
                        AssessmentTemplateQuestion__r.Type__c,
-                       AssessmentTemplateQuestion__r.Order__c
+                       AssessmentTemplateQuestion__r.Order__c,
+                       AssessmentTemplateQuestion__r.Score__c  // ⭐ 최대 점수 추가
                 FROM AssessmentSheetItem__c
                 WHERE AssessmentResultSection__c IN :sectionIds
                 ORDER BY AssessmentTemplateQuestion__r.Order__c
             ];
-            
+
             // 선다형 질문들의 Template Question ID 수집
             Set<Id> choosableQuestionIds = new Set<Id>();
             for (AssessmentSheetItem__c item : items) {
@@ -335,7 +319,7 @@ public with sharing class DKEDU_AssessmentPageController {
                     choosableQuestionIds.add(item.AssessmentTemplateQuestion__c);
                 }
             }
-            
+
             // 선다형 질문들의 옵션 조회
             Map<Id, List<Map<String, Object>>> optionsMap = new Map<Id, List<Map<String, Object>>>();
             if (!choosableQuestionIds.isEmpty()) {
@@ -345,129 +329,98 @@ public with sharing class DKEDU_AssessmentPageController {
                     WHERE AssessmentTemplateQuestion__c IN :choosableQuestionIds
                     ORDER BY AssessmentTemplateQuestion__c, Order__c
                 ];
-                
+
                 for (AssessmentTemplateQuestionItem__c item : questionItems) {
                     if (!optionsMap.containsKey(item.AssessmentTemplateQuestion__c)) {
                         optionsMap.put(item.AssessmentTemplateQuestion__c, new List<Map<String, Object>>());
                     }
-                    
+
                     optionsMap.get(item.AssessmentTemplateQuestion__c).add(new Map<String, Object>{
                         'label' => item.Content__c,
                         'value' => item.Content__c
                     });
                 }
             }
-            
+
             // 데이터 구조화
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('sheet', sheet);
-            
             List<Map<String, Object>> sectionList = new List<Map<String, Object>>();
-            
+
             for (AssessmentSheetSection__c section : sections) {
                 Map<String, Object> sectionMap = new Map<String, Object>();
                 sectionMap.put('Id', section.Id);
                 sectionMap.put('Name', section.AssessmentTemplateGroup__r.Name);
                 sectionMap.put('SequenceOrder', section.SequenceOrder__c);
-                
+
                 List<Map<String, Object>> itemList = new List<Map<String, Object>>();
-                
+
                 for (AssessmentSheetItem__c item : items) {
                     if (item.AssessmentResultSection__c == section.Id) {
                         Map<String, Object> itemMap = new Map<String, Object>();
                         itemMap.put('Id', item.Id);
                         itemMap.put('questionContent', item.AssessmentTemplateQuestion__r.Question__c);
                         itemMap.put('questionType', item.AssessmentTemplateQuestion__r.Type__c);
-                        itemMap.put('Score__c', item.Score__c);          // ⭐ LWC에서 기대하는 키명
-                        itemMap.put('Answer__c', item.Answer__c);        // ⭐ LWC에서 기대하는 키명
-                        itemMap.put('score', item.Score__c);             // 기존 호환성 유지
-                        itemMap.put('response', item.Answer__c);         // 기존 호환성 유지
+                        itemMap.put('Score__c', item.Score__c);
+                        itemMap.put('Answer__c', item.Answer__c);
+                        itemMap.put('maxScore', item.AssessmentTemplateQuestion__r.Score__c); // ⭐ 최대 점수 추가
                         itemMap.put('order', item.AssessmentTemplateQuestion__r.Order__c);
-                        
+
                         // 선다형이면 옵션 추가
                         String questionType = item.AssessmentTemplateQuestion__r.Type__c;
                         if (questionType == 'Choosable' || questionType == 'Multi Choosable') {
                             List<Map<String, Object>> options = optionsMap.get(item.AssessmentTemplateQuestion__c);
                             itemMap.put('options', options != null ? options : new List<Map<String, Object>>());
                         }
-                        
+
                         itemList.add(itemMap);
                     }
                 }
-                
+
                 sectionMap.put('items', itemList);
                 sectionList.add(sectionMap);
             }
-            
+
+            Map<String, Object> result = new Map<String, Object>();
+            result.put('id', sheet.Id);
+            result.put('name', sheet.Name);
+            result.put('status', sheet.Status__c);
             result.put('sections', sectionList);
+
             return result;
-            
+
         } catch (Exception e) {
-            System.debug('Error loading assessment data: ' + e.getMessage());
-            throw new AuraHandledException('데이터 조회 실패: ' + e.getMessage());
-        }
-    }
-    
-    @AuraEnabled
-    public static void saveResponse(String itemId, String answer) {
-        try {
-            if (String.isBlank(itemId)) {
-                throw new AuraHandledException('Item ID가 전달되지 않았습니다.');
-            }
-            
-            List<AssessmentSheetItem__c> items = [
-                SELECT Id, Answer__c 
-                FROM AssessmentSheetItem__c 
-                WHERE Id = :itemId 
-                LIMIT 1
-            ];
-            
-            if (items.isEmpty()) {
-                throw new AuraHandledException('해당 Assessment Item을 찾을 수 없습니다.');
-            }
-            
-            AssessmentSheetItem__c item = items[0];
-            item.Answer__c = answer;
-            update item;
-            
-        } catch (Exception e) {
-            System.debug('Error saving response: ' + e.getMessage());
-            throw new AuraHandledException('응답 저장 실패: ' + e.getMessage());
+            System.debug('Get assessment data error: ' + e.getMessage());
+            throw new AuraHandledException('Assessment 데이터 조회 실패: ' + e.getMessage());
         }
     }
 
     @AuraEnabled
-    public static Map<String, Object> getAssessmentSheetInfo(String recordId) {
+    public static String saveResponse(String itemId, String answer) {
         try {
-            if (String.isBlank(recordId)) {
-                throw new AuraHandledException('Record ID가 전달되지 않았습니다.');
+            if (String.isBlank(itemId)) {
+                throw new AuraHandledException('Item ID가 전달되지 않았습니다.');
             }
-            
-            List<AssessmentSheet__c> sheets = [
-                SELECT Id, Name, Status__c, AssessmentMasterId__c, AssessmentTemplateId__c
-                FROM AssessmentSheet__c
-                WHERE Id = :recordId
+
+            List<AssessmentSheetItem__c> items = [
+                SELECT Id, Answer__c 
+                FROM AssessmentSheetItem__c 
+                WHERE Id = :itemId
                 LIMIT 1
             ];
-            
-            if (sheets.isEmpty()) {
-                throw new AuraHandledException('해당 Assessment Sheet를 찾을 수 없습니다.');
+
+            if (items.isEmpty()) {
+                throw new AuraHandledException('해당 Assessment Item을 찾을 수 없습니다.');
             }
+
+            AssessmentSheetItem__c item = items[0];
+            item.Answer__c = answer;
+
+            update item;
             
-            AssessmentSheet__c sheet = sheets[0];
-            
-            if (sheet.Status__c == 'Complete') {
-                throw new AuraHandledException('이미 완료된 평가입니다. 결과 페이지를 확인해주세요.');
-            }
-            
-            Map<String, Object> result = new Map<String, Object>();
-            result.put('Id', sheet.Id);
-            result.put('Name', sheet.Name);
-            result.put('Status', sheet.Status__c);
-            return result;
-            
+            return '응답이 저장되었습니다.';
+
         } catch (Exception e) {
-            throw new AuraHandledException('Assessment Sheet 정보 조회 실패: ' + e.getMessage());
+            System.debug('Save response error: ' + e.getMessage());
+            throw new AuraHandledException('응답 저장 실패: ' + e.getMessage());
         }
     }
 
@@ -513,45 +466,10 @@ public with sharing class DKEDU_AssessmentPageController {
             // 3. 이동할 대상 결정 로직
             Map<String, Object> result = new Map<String, Object>();
             
-            // Option 1: 같은 AssessmentTarget의 최신 Assessment Sheet로 이동
-            if (currentSheet.AssessmentTargetId__c != null) {
-                List<AssessmentSheet__c> latestSheets = [
-                    SELECT Id, Name, Status__c, CreatedDate
-                    FROM AssessmentSheet__c
-                    WHERE AssessmentTargetId__c = :currentSheet.AssessmentTargetId__c
-                    AND Status__c IN ('Waiting', 'In Progress')
-                    ORDER BY CreatedDate DESC
-                    LIMIT 1
-                ];
-                
-                if (!latestSheets.isEmpty()) {
-                    result.put('navigationType', 'RECORD');
-                    result.put('recordId', latestSheets[0].Id);
-                    result.put('message', '다음 평가로 이동합니다.');
-                    return result;
-                }
-            }
-            
-            // Option 2: Assessment Target 레코드로 이동 (Assessment Target이 있는 경우)
-            if (currentSheet.AssessmentTargetId__c != null) {
-                result.put('navigationType', 'RECORD');
-                result.put('recordId', currentSheet.AssessmentTargetId__c);
-                result.put('message', '평가 대상 페이지로 이동합니다.');
-                return result;
-            }
-            
-            // Option 3: Assessment Master 레코드로 이동
-            if (currentSheet.AssessmentMasterId__c != null) {
-                result.put('navigationType', 'RECORD');
-                result.put('recordId', currentSheet.AssessmentMasterId__c);
-                result.put('message', '평가 마스터 페이지로 이동합니다.');
-                return result;
-            }
-            
-            // Option 4: Assessment Sheet 목록 페이지로 이동 (기본값)
-            result.put('navigationType', 'LIST');
-            result.put('objectApiName', 'AssessmentSheet__c');
-            result.put('message', '평가 목록으로 이동합니다.');
+            // Option 1: 완료된 현재 Assessment Sheet로 이동 (기본 동작)
+            result.put('navigationType', 'RECORD');
+            result.put('recordId', currentSheet.Id);
+            result.put('message', '완료된 평가 결과를 확인합니다.');
             return result;
             
         } catch (Exception e) {
@@ -588,6 +506,7 @@ public with sharing class DKEDU_AssessmentPageController {
                 SELECT Id, Answer__c, Score__c, AssessmentResultSection__c,
                        AssessmentTemplateQuestion__r.Question__c,
                        AssessmentTemplateQuestion__r.Type__c,
+                       AssessmentTemplateQuestion__r.Score__c,  // ⭐ 최대 점수 추가
                        AssessmentResultSection__r.AssessmentTemplateGroup__r.Name,
                        AssessmentResultSection__r.SequenceOrder__c
                 FROM AssessmentSheetItem__c

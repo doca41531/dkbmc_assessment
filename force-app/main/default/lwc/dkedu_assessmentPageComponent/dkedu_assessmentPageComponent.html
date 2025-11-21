@@ -1,8 +1,8 @@
 <!--
-  @description       : 
+  @description       : Assessment Page Component with dynamic score validation
   @author            : mingyu.park@dkbmc.com
   @group             : 
-  @last modified on  : 2025-11-20
+  @last modified on  : 2025-11-21
   @last modified by  : mingyu.park@dkbmc.com
 -->
 <template>
@@ -59,7 +59,7 @@
             <!-- 섹션 진행 상황 -->
             <div class="section-progress slds-m-bottom_large">
                 <p class="slds-text-body_small slds-text-color_weak">
-                    섹션 {currentSectionIndex} / {assessmentData.sections.length}
+                    섹션 {currentSectionNumber} / {assessmentData.sections.length}
                 </p>
             </div>
 
@@ -87,6 +87,12 @@
                                     </div>
                                     <div class="slds-text-body_small slds-text-color_weak">
                                         {item.questionType}
+                                        <!-- ⭐ 채점 모드일 때 최대 점수 표시 -->
+                                        <template if:true={isGradingMode}>
+                                            <span class="slds-m-left_x-small slds-text-color_success">
+                                                (최대: {item.maxScore}점)
+                                            </span>
+                                        </template>
                                     </div>
                                 </div>
                                 
@@ -114,20 +120,26 @@
                                             <h4 class="slds-text-heading_small slds-m-bottom_small">
                                                 🎯 점수 부여
                                             </h4>
+                                            <!-- ⭐ 동적 max 값과 라벨 적용 -->
                                             <lightning-input 
                                                 data-id={item.Id}
                                                 data-field-type="score"
                                                 name={item.Id}
                                                 type="number"
-                                                label="점수 (0-100)"
+                                                label={item.scoreLabel}
                                                 value={item.scoreValue}
                                                 min="0"
-                                                max="100"
-                                                step="1"
+                                                max={item.maxScore}
+                                                step="0.1"
                                                 onchange={handleScoreChange}
                                                 variant="label-stacked"
-                                                class="slds-form-element_stacked">
+                                                class="slds-form-element_stacked"
+                                                message-when-range-overflow={item.scoreValidationMessage}>
                                             </lightning-input>
+                                            <!-- ⭐ 점수 입력 도움말 -->
+                                            <div class="slds-form-element__help slds-text-color_weak">
+                                                0점부터 {item.maxScore}점까지 입력 가능합니다.
+                                            </div>
                                         </div>
                                     </template>
                                     
@@ -139,12 +151,13 @@
                                             data-id={item.Id}
                                             data-question-type={item.questionType}
                                             name={item.Id}
-                                            label="답안을 입력하세요"
+                                            type="text"
+                                            label="제출된 답변"
                                             value={item.inputValue}
-                                            variant="label-stacked"
+                                            placeholder="답변을 입력하세요"
                                             onchange={handleResponse}
                                             disabled={isReadOnly}
-                                            class="slds-form-element_stacked">
+                                            variant="label-stacked">
                                         </lightning-input>
                                     </template>
 
@@ -155,22 +168,26 @@
                                             data-question-type={item.questionType}
                                             name={item.Id}
                                             type="number"
-                                            label="점수를 입력하세요"
+                                            label="점수 부여"
                                             value={item.inputValue}
-                                            variant="label-stacked"
+                                            placeholder="0-100 사이의 점수를 입력하세요"
+                                            min="0"
+                                            max="100"
+                                            step="1"
                                             onchange={handleResponse}
                                             disabled={isReadOnly}
-                                            class="slds-form-element_stacked">
+                                            variant="label-stacked">
                                         </lightning-input>
                                     </template>
 
-                                    <!-- Choosable (단일 선택) -->
+                                    <!-- Choosable (Single Choice) -->
                                     <template if:true={item.isChoosable}>
-                                        <lightning-radio-group
+                                        <lightning-radio-group 
                                             data-id={item.Id}
                                             data-question-type={item.questionType}
                                             name={item.Id}
                                             label="선택하세요"
+                                            value={item.inputValue}
                                             options={item.options}
                                             onchange={handleResponse}
                                             disabled={isReadOnly}
@@ -178,7 +195,7 @@
                                         </lightning-radio-group>
                                     </template>
 
-                                    <!-- Multi Choosable (다중 선택) -->
+                                    <!-- Multi Choosable (Multiple Choice) -->
                                     <template if:true={item.isMultiChoosable}>
                                         <fieldset class="slds-form-element">
                                             <legend class="slds-form-element__legend slds-form-element__label">선택하세요 (여러 개 가능)</legend>
@@ -267,8 +284,8 @@
                         class="slds-m-right_x-small">
                     </lightning-button>
                     
-                    <!-- ⭐ Complete 상태일 때 제출 버튼 숨김 -->
-                    <template if:false={isCompleted}>
+                    <!-- ⭐ 제출 버튼 표시 조건: 일반 모드에서는 Complete이 아닐 때, 채점 모드에서는 항상 -->
+                    <template if:true={showSubmitButton}>
                         <lightning-button 
                             label="제출" 
                             icon-name="utility:check"
@@ -279,8 +296,8 @@
                         </lightning-button>
                     </template>
                     
-                    <!-- ⭐ Complete 상태일 때 완료 표시 -->
-                    <template if:true={isCompleted}>
+                    <!-- ⭐ 일반 모드에서 Complete 상태일 때만 완료 표시 -->
+                    <template if:true={showCompletedButton}>
                         <lightning-button 
                             label="완료됨" 
                             icon-name="utility:success"

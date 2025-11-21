@@ -1,235 +1,298 @@
 .assessment-container {
-    max-width: 900px;
-    margin: 0 auto;
-    font-family: 'Salesforce Sans', Arial, sans-serif;
+max-width: 900px;
+margin: 0 auto;
+font-family: 'Salesforce Sans', Arial, sans-serif;
 }
 
 .current-section {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    border: 1px solid #e5e5e5;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+border-radius: 8px;
+border: 1px solid #e5e5e5;
 }
 
 .question-item {
-    background: #fafaf9;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
-    padding: 1.5rem;
-    transition: all 0.2s ease-in-out;
+background: #fafaf9;
+border: 1px solid #e5e5e5;
+border-radius: 6px;
+padding: 1.5rem;
+transition: all 0.2s ease-in-out;
 }
 
 .question-item:hover {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    border-color: #1b96ff;
-    transform: translateY(-1px);
+box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+border-color: #1b96ff;
+transform: translateY(-1px);
 }
 
 .question-header {
-    border-bottom: 1px solid #e5e5e5;
-    padding-bottom: 0.5rem;
+border-bottom: 1px solid #e5e5e5;
+padding-bottom: 0.5rem;
 }
 
 .question-content {
-    line-height: 1.6;
-    font-size: 1rem;
+line-height: 1.6;
+font-size: 1rem;
 }
 
 .answer-input {
-    background: white;
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid #d8dde6;
+background: white;
+padding: 1rem;
+border-radius: 4px;
+border: 1px solid #d8dde6;
 }
 
 .navigation-buttons {
-    border-top: 1px solid #e5e5e5;
-    padding-top: 1.5rem;
-    background: #f7f9fb;
-    margin: 1.5rem -1rem -1rem -1rem;
-    padding: 1.5rem 1rem;
-    border-radius: 0 0 8px 8px;
+border-top: 1px solid #e5e5e5;
+padding-top: 1.5rem;
+background: #f7f9fb;
+margin: 1.5rem -1rem -1rem -1rem;
+padding: 1.5rem 1rem;
+border-radius: 0 0 8px 8px;
 }
 
 .section-progress {
-    text-align: center;
-    background: #f3f3f3;
-    padding: 0.5rem;
-    border-radius: 4px;
-    border-left: 4px solid #1b96ff;
+text-align: center;
+background: #f3f3f3;
+padding: 0.5rem;
+border-radius: 4px;
+border-left: 4px solid #1b96ff;
 }
 
 /* 진행률 바 커스터마이징 */
 .slds-progress-bar {
-    border-radius: 6px;
-    overflow: hidden;
+border-radius: 6px;
+overflow: hidden;
 }
 
 .slds-progress-bar__value {
-    background: linear-gradient(90deg, #1b96ff 0%, #0176d3 100%);
-    transition: width 0.5s ease-in-out;
+background: linear-gradient(90deg, #1b96ff 0%, #0176d3 100%);
+transition: width 0.5s ease-in-out;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-    .assessment-container {
-        margin: 0;
-        padding: 0.5rem;
-    }
-    
-    .question-item {
-        padding: 1rem;
-    }
-    
-    .navigation-buttons .slds-button-group {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .navigation-buttons lightning-button {
-        margin: 0.25rem 0 !important;
-        width: 100%;
-    }
+.assessment-container {
+margin: 0;
+padding: 0.5rem;
+}
+
+.question-item {
+padding: 1rem;
+}
+
+.navigation-buttons .slds-button-group {
+flex-direction: column;
+width: 100%;
+}
+
+.navigation-buttons lightning-button {
+margin: 0.25rem 0 !important;
+width: 100%;
+}
 }
 
 @media (max-width: 480px) {
-    .current-section {
-        margin: 0 -0.5rem;
-        border-radius: 4px;
-    }
-    
-    .question-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
+.current-section {
+margin: 0 -0.5rem;
+border-radius: 4px;
+}
+
+.question-header {
+flex-direction: column;
+align-items: flex-start;
+gap: 0.5rem;
+}
 }
 
 /* 접근성 개선 */
 .question-item:focus-within {
-    outline: 2px solid #1b96ff;
-    outline-offset: 2px;
+outline: 2px solid #1b96ff;
+outline-offset: 2px;
 }
 
 /* 로딩 상태 스타일 */
 .slds-spinner_container {
-    background: rgba(255, 255, 255, 0.9);
+background: rgba(255, 255, 255, 0.9);
 }
 
 /* 별점 평가 스타일 */
 .star-rating-container {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
+display: flex;
+gap: 0.5rem;
+align-items: center;
+flex-wrap: wrap;
 }
 
 .star-rating-item {
-    position: relative;
+position: relative;
 }
 
 .star-rating-item input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
+position: absolute;
+opacity: 0;
+width: 0;
+height: 0;
 }
 
 .star-rating-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 4px;
-    transition: all 0.2s ease-in-out;
+display: flex;
+flex-direction: column;
+align-items: center;
+cursor: pointer;
+padding: 0.5rem;
+border-radius: 4px;
+transition: all 0.2s ease-in-out;
 }
 
 .star-rating-label:hover {
-    background-color: #f3f2f2;
+background-color: #f3f2f2;
 }
 
 .star-rating-item input[type="radio"]:checked + .star-rating-label {
-    background-color: #1b96ff;
-    color: white;
+background-color: #1b96ff;
+color: white;
 }
 
 .star-rating-item input[type="radio"]:checked + .star-rating-label .star-icon {
-    color: #ffd863;
+color: #ffd863;
 }
 
 .star-icon {
-    color: #c9c7c5;
-    transition: color 0.2s ease-in-out;
+color: #c9c7c5;
+transition: color 0.2s ease-in-out;
 }
 
 .star-label {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+font-size: 0.75rem;
+margin-top: 0.25rem;
 }
 
 /* 체크박스 스타일 개선 */
 .slds-checkbox {
-    display: block;
-    margin-bottom: 0.5rem;
+display: block;
+margin-bottom: 0.5rem;
 }
 
 .slds-checkbox input[type="checkbox"]:checked ~ .slds-checkbox__label .slds-checkbox__faux {
-    background-color: #1b96ff;
-    border-color: #1b96ff;
+background-color: #1b96ff;
+border-color: #1b96ff;
 }
 
 /* 라디오 버튼 스타일 개선 */
 .slds-form-element__control .slds-radio {
+margin-bottom: 0.5rem;
+}
+
+/* ⭐ 조건부 질문 및 선택형 옵션 스타일링 */
+.question-item[data-question-id] {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.star-rating-container {
+    display: flex;
+    gap: 8px;
+}
+
+.star-rating-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.star-icon {
+    color: #ffb75d;
+}
+
+/* 조건부 질문 하이라이트 */
+.question-item .slds-notify_toast {
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+/* 라디오 버튼과 체크박스 간격 개선 */
+.slds-radio, .slds-checkbox {
+    display: block !important;
     margin-bottom: 0.5rem;
 }
 
-   /* ⭐ 조건부 질문 및 선택형 옵션 스타일링 */
-        .question-item[data-question-id] {
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        .star-rating-container {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .star-rating-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .star-icon {
-            color: #ffb75d;
-        }
-        
-        /* 조건부 질문 하이라이트 */
-        .question-item .slds-notify_toast {
-            font-size: 0.75rem;
-            line-height: 1;
-        }
-        
-        /* 라디오 버튼과 체크박스 간격 개선 */
-        .slds-radio, .slds-checkbox {
-            display: block !important;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* 옵션 라벨 스타일링 */
-        .slds-radio__label, .slds-checkbox__label {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* 조건부 질문 표시기 스타일 */
-        .question-item .slds-notify_toast.slds-theme_info {
-            background-color: #e7f3ff;
-            border-left: 3px solid #0176d3;
-        }
+/* 옵션 라벨 스타일링 */
+.slds-radio__label, .slds-checkbox__label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
 
-        .Multi-choosable-flex{
-            display: flex;
-            gap: 10px;
-            margin-bottom: 0.5rem;
-        }
+/* 조건부 질문 표시기 스타일 */
+.question-item .slds-notify_toast.slds-theme_info {
+    background-color: #e7f3ff;
+    border-left: 3px solid #0176d3;
+}
+
+.Multi-choosable-flex{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+}
+/* ⭐ 점수 입력 필드 스타일링 */
+.grading-section {
+    background-color: #fafbfd;
+    border-radius: 6px;
+    position: relative;
+}
+
+.grading-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ffd863 0%, #ffb75d 100%);
+    border-radius: 6px 6px 0 0;
+}
+
+.submitted-answer {
+    border-left: 3px solid #e5e5e5;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.submitted-answer:hover {
+    border-left-color: #1b96ff;
+}
+
+/* 점수 입력 필드 강조 */
+lightning-input[data-field-type="score"] {
+    position: relative;
+}
+
+lightning-input[data-field-type="score"] .slds-form-element__label {
+    font-weight: 600;
+    color: #0176d3;
+}
+
+lightning-input[data-field-type="score"] .slds-input {
+    border: 2px solid #e5e5e5;
+    transition: all 0.2s ease-in-out;
+}
+
+lightning-input[data-field-type="score"] .slds-input:focus {
+    border-color: #1b96ff;
+    box-shadow: 0 0 0 3px rgba(27, 150, 255, 0.1);
+}
+
+/* 점수 검증 오류 스타일 */
+lightning-input[data-field-type="score"].slds-has-error .slds-input {
+    border-color: #ea001e;
+    box-shadow: 0 0 0 3px rgba(234, 0, 30, 0.1);
+}
+
+/* 최대 점수 표시 스타일 */
+.slds-text-color_success {
+    font-weight: 600;
+}
+
+/* 점수 입력 도움말 스타일 */
+.slds-form-element__help {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
