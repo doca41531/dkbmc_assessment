@@ -1,0 +1,396 @@
+/* Assessment Master Modal Component - Lightning Modal Version */
+
+/* Modal Container - 애니메이션 개선 */
+.slds-modal {
+    animation: modalSlideIn 0.2s ease-out;
+    transform: translateY(0);
+}
+
+.slds-modal__container {
+    animation: containerFadeIn 0.2s ease-out;
+    transform: translateY(0);
+    position: relative;
+}
+
+.slds-modal__header {
+    position: relative;
+    transform: translateY(0);
+    animation: none;
+}
+
+/* 애니메이션 정의 */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes containerFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 백드롭 애니메이션 */
+.slds-backdrop {
+    animation: backdropFadeIn 0.2s ease-out;
+}
+
+.modal-footer{
+    --slds-c-modal-radius-border: none;
+}
+
+@keyframes backdropFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.8;
+    }
+}
+
+/* Form Content Styling */
+.form-container {
+    padding: 1rem 0;
+}
+
+.slds-p-horizontal_small, .slds-p-horizontal--small{
+    padding-inline: 0;
+}
+
+.slds-modal__footer{
+    border-radius: none;
+}
+
+/* Loading Spinner */
+.slds-spinner_container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Form Field Styling */
+lightning-textarea,
+lightning-combobox,
+lightning-input,
+lightning-input-field {
+    margin-bottom: 0.5rem;
+}
+
+/* Required Field Indicator */
+.required-field .slds-form-element__label::after {
+    content: " *";
+    color: #c23934;
+    font-weight: bold;
+}
+
+/* Field Spacing */
+.slds-col {
+    padding: 0.25rem;
+    padding-left:0;
+}
+
+.slds-grid{
+    align-items: start;
+}
+
+/* Custom Input Styling */
+lightning-input[type="date"] {
+    max-width: 200px;
+}
+
+lightning-textarea[data-field="description"] {
+    min-height: 100px;
+}
+
+/* Checkbox Styling */
+lightning-input[type="checkbox"] {
+    margin-top: 1rem;
+    --slds-c-checkbox-label-text-font-weight: bold;
+}
+
+/* Contact Search Section */
+.contact-search-section {
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.required-mark{
+    color: #c23934; 
+    font-size: 13px; 
+    font-weight: bold; 
+    margin-right: 0.25rem;
+}
+
+.session-header{
+    border-radius: 0.5rem;
+    font-size: 20px;
+    padding: 0.25rem 0.75rem;
+}
+
+.ml-large{
+	margin-left: 0.5rem;
+}
+
+.ml-middle{
+	margin-left: 0.25rem;
+}
+
+.ml-small{
+	margin-left: 0.125rem;
+}
+
+.target-name{
+	font-size: 1rem; 
+	font-weight: 700; 
+	color: #181818;
+}
+
+.wb-ka{
+	word-break: keep-all;
+}
+
+.mw0{
+	min-width: 0;
+}
+
+.f1{
+	flex: 1;
+}
+
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+/* Selected Targets Styling */
+.selected-targets-container {
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    border: 1px solid #e5e5e5;
+    margin-top: 1rem;
+}
+
+.selected-targets-container .slds-card {
+    border: 1px solid #d8dde6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.selected-targets-container .slds-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Contact name styling improvements */
+.selected-targets-container .slds-card__body {
+    padding: 0.75rem;
+    min-height: auto;
+}
+
+.selected-targets-container strong {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #181818 !important;
+    line-height: 1.4 !important;
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+/* Prevent text wrapping and breaking */
+.selected-targets-container .slds-has-flexi-truncate {
+    min-width: 0 !important;
+    flex: 1 !important;
+    word-break: keep-all !important;
+    overflow: hidden !important;
+}
+
+.selected-targets-container .slds-truncate {
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Email and account text styling */
+.selected-targets-container .slds-text-body_small {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+    margin-top: 0.25rem !important;
+    word-break: keep-all !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Ensure proper grid alignment */
+.selected-targets-container .slds-grid {
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+}
+
+/* Button positioning */
+.selected-targets-container .slds-col.slds-no-flex {
+    flex-shrink: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+/* Card width management */
+.selected-targets-container .slds-col {
+    min-width: 0 !important;
+}
+
+/* Additional Korean text support */
+.selected-targets-container * {
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slds-col {
+        width: 100% !important;
+        padding: 0.5rem 0;
+    }
+    
+    .form-container {
+        padding: 0.5rem;
+    }
+    
+    .slds-modal__container {
+        margin: 0.5rem;
+        max-height: calc(100vh - 1rem);
+    }
+    
+    .selected-targets-container .slds-col.slds-large-size_1-of-3 {
+        width: 100%;
+    }
+}
+
+/* Error State Styling */
+.slds-has-error lightning-input,
+.slds-has-error lightning-textarea,
+.slds-has-error lightning-combobox {
+    border-color: #c23934;
+}
+
+/* Custom Button Styling in Footer */
+lightning-modal-footer lightning-button {
+    min-width: 80px;
+}
+
+/* Grid Layout Improvements */
+.slds-grid.slds-gutters {
+    margin: 0 -0.5rem;
+}
+
+.slds-grid.slds-gutters .slds-col {
+    padding: 0 0.5rem;
+}
+
+/* Modal 크기 조정 */
+.slds-modal__container {
+    width: 60rem;
+    max-width: 90vw;
+}
+
+/* 헤더 고정 */
+.slds-modal__header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* 콘텐츠 스크롤 */
+.slds-modal__content {
+    max-height: calc(90vh - 8rem);
+    overflow-y: auto;
+}
+
+/* 푸터 고정 */
+.slds-modal__footer {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    z-index: 100;
+}
+
+/* Section header styling */
+.section-header {
+    background: var(--slds-g-color-neutral-base-95, #f3f2f2);
+    border: 1px solid var(--slds-c-card-color-border, #d8dde6);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    color: #181818;
+    font-weight: 600;
+    font-size: 20px;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Combobox dropdown improvements */
+.slds-combobox__input {
+    border-radius: var(--slds-c-input-radius-border, 0.25rem);
+}
+
+/* Loading state for form inputs */
+.form-saving lightning-input,
+.form-saving lightning-combobox,
+.form-saving lightning-textarea {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .selected-targets-container .slds-card {
+        border-width: 2px;
+    }
+    
+    .section-header {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .selected-targets-container .slds-card,
+    .contact-search-section {
+        transition: none;
+        animation: none;
+    }
+}

@@ -171,10 +171,10 @@ public with sharing class DKEDU_AssessmentPreviewController {
                             }
                         }
                         
-                        // Question type labels - 수정된 부분
+                        // Question type labels
                         questionWrapper.questionTypeLabel = getQuestionTypeLabel(questionRecord.Type__c);
                         
-                        // Question type flags - 수정된 부분
+                        // Question type flags
                         questionWrapper.isChoosable = (questionRecord.Type__c == 'Choosable' || questionRecord.Type__c == 'Multi Choosable');
                         questionWrapper.isStarRating = (questionRecord.Type__c == 'Star Rating');
                         questionWrapper.isShortAnswer = (questionRecord.Type__c == 'Short Answer');
@@ -224,16 +224,16 @@ public with sharing class DKEDU_AssessmentPreviewController {
     }
     
     /**
-     * @description Get localized question type label - 수정된 버전
+     * @description Get localized question type label
      */
     private static String getQuestionTypeLabel(String type) {
         try {
             Map<String, String> typeMap = new Map<String, String>{
                 'Choosable' => 'Single Choice',
-                'Multi Choosable' => 'Multiple Choice',  // 공백 포함으로 수정
-                'Star Rating' => 'Star Rating',          // 공백 포함으로 수정
-                'Short Answer' => 'Short Answer',        // 공백 포함으로 수정
-                'Number Point' => 'Number Input'         // 공백 포함으로 수정
+                'Multi Choosable' => 'Multiple Choice', 
+                'Star Rating' => 'Star Rating',          
+                'Short Answer' => 'Short Answer',        
+                'Number Point' => 'Number Input'         
             };
             
             return typeMap.containsKey(type) ? typeMap.get(type) : type;

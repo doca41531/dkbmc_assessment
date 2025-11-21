@@ -1,0 +1,104 @@
+/* Modal Container - 애니메이션 개선 */
+.slds-modal {
+    animation: modalSlideIn 0.2s ease-out;
+    transform: translateY(0);
+}
+
+.slds-modal__container {
+    animation: containerFadeIn 0.2s ease-out;
+    transform: translateY(0);
+    position: relative;
+    width: 60rem;
+    max-width: 95vw;
+}
+
+.slds-modal__header {
+    position: relative;
+    transform: translateY(0);
+    animation: none;
+}
+
+/* Required field styling */
+.required-mark{
+    color: #c23934; 
+    font-size: 13px; 
+    font-weight: bold; 
+    margin-right: 0.25rem;
+}
+
+.session-header{
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Grade Items Table Styling */
+.grade-item-input lightning-input {
+    margin-bottom: 0;
+}
+
+.slds-table td {
+    vertical-align: middle;
+}
+
+/* Quick Templates Grid */
+.slds-grid.slds-gutters {
+    margin: 0 -0.5rem;
+}
+
+.slds-grid.slds-gutters .slds-col {
+    padding: 0 0.5rem;
+}
+
+/* Animation Keyframes */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes containerFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Loading Spinner */
+.slds-spinner_container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slds-modal__container {
+        width: 95vw;
+        margin: 0.5rem;
+        max-height: calc(100vh - 1rem);
+    }
+    
+    .slds-table_bordered th,
+    .slds-table_bordered td {
+        padding: 0.25rem;
+    }
+    
+    .slds-grid .slds-col {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+}

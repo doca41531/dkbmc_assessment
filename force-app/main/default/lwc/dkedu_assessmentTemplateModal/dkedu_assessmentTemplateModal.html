@@ -1,0 +1,305 @@
+<!--
+  @description       : Assessment Template Modal with complete functionality using LightningModal
+  @author            : mingyu.park@dkbmc.com
+  @last modified on  : 2025-11-13
+  @version           : 2.0.0
+-->
+<template>
+    <lightning-modal-header label={modalHeaderLabel}>
+    </lightning-modal-header>
+    
+    <lightning-modal-body>
+        <!-- Loading Spinner -->
+        <template lwc:if={isLoading}>
+            <div class="slds-align_absolute-center slds-p-around_large">
+                <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Required Field Indicator -->
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+            <div></div>
+            <div class="slds-text-align_right">
+                <span class="required-mark">* </span>
+                = Required Information
+            </div>
+        </div>
+
+        <!-- Step 1: Template Information & Question Selection -->
+        <template lwc:if={isStep1}>
+            <section class="slds-m-bottom_medium">
+                <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small session-header">
+                    Information
+                </h3>
+
+                <div class="slds-p-top_small slds-p-left_large slds-p-right_large">
+                    <!-- Template Name -->
+                    <lightning-input
+                        label="Template Name"
+                        name="templateName"
+                        value={templateName}
+                        placeholder="Enter template name"
+                        onchange={handleTemplateNameChange}
+                        required
+                        class="slds-m-bottom_medium">
+                    </lightning-input>
+
+                    <!-- Description -->
+                    <lightning-textarea
+                        label="Description"
+                        name="description"
+                        value={description}
+                        placeholder="Enter description"
+                        onchange={handleDescriptionChange}
+                        max-length="255"
+                        class="slds-m-bottom_medium">
+                    </lightning-textarea>
+
+                    <!-- Sessions Container -->
+                    <template for:each={sessions} for:item="session" for:index="index">
+                        <div key={session.id} class="session-container slds-m-bottom_large">
+                            <!-- Session Header -->
+                            <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input
+                                        label="Session Name"
+                                        value={session.name}
+                                        placeholder="Enter session name"
+                                        data-session-id={session.id}
+                                        onchange={handleSessionNameChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-4">
+                                    <lightning-input
+                                        type="number"
+                                        label="Session Score"
+                                        value={session.score}
+                                        placeholder="Enter score"
+                                        data-session-id={session.id}
+                                        onchange={handleSessionScoreChange}
+                                        min="0"
+                                        step="0.01">
+                                    </lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-4 slds-p-top_large">
+                                    <lightning-button
+                                        variant="destructive-text"
+                                        label="Delete Session"
+                                        data-session-id={session.id}
+                                        onclick={removeSession}
+                                        disabled={isSingleSession}>
+                                    </lightning-button>
+                                </div>
+                            </div>
+
+                            <!-- Question Selection with Integrated Search -->
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label">Questions</label>
+                                <div class="slds-form-element__control">
+                                    <!-- Search Field inside border -->
+                                    <div class="search-field">
+                                        <lightning-input
+                                            type="search"
+                                            variant="label-hidden"
+                                            placeholder="Search by question text or type..."
+                                            data-session-id={session.id}
+                                            onchange={handleQuestionSearch}
+                                            class="mb-large">
+                                        </lightning-input>
+                                        
+                                        <lightning-dual-listbox
+                                            name="questions"
+                                            variant="label-hidden"
+                                            source-label="Available Questions"
+                                            selected-label="Selected Questions"
+                                            options={session.availableQuestionOptions}
+                                            value={session.selectedQuestionValues}
+                                            data-session-id={session.id}
+                                            onchange={handleDualListboxChange}
+                                            min="0"
+                                            max="100">
+                                        </lightning-dual-listbox>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <!-- Add Session Button -->
+                    <div class="add-session-container slds-text-align_center slds-m-bottom_large">
+                        <lightning-button
+                            variant="neutral"
+                            label="Add Session"
+                            icon-name="utility:add"
+                            onclick={addSession}>
+                        </lightning-button>
+                    </div>
+                    
+                    <!-- Checkbox Options -->
+                    <div class="checkbox-grid slds-m-bottom_medium">
+                        <div class="slds-grid slds-wrap slds-gutters_small">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input
+                                    type="checkbox"
+                                    label="Is Active"
+                                    checked={isActive}
+                                    variant="label-stacked"
+                                    onchange={handleIsActiveChange}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </template>
+
+        <!-- Step 2: Question Score Setting -->
+        <template lwc:if={isStep2}>
+            <section class="slds-m-bottom_medium">
+                <!-- Header with Session Score -->
+                <div class="slds-theme_shade slds-grid_vertical-align-center slds-grid slds-grid_align-spread slds-m-bottom_small slds-p-around_small session-header">
+                    <div class="slds-col">
+                        <h3 class="slds-text-heading_small fs-15">
+                            Question Score Settings
+                        </h3>
+                    </div>
+                    <div class="slds-col slds-text-align_right slds-grid_vertical-align-center slds-grid">
+                        <span class="session-score">
+                            Session Score: 
+                        </span>
+                        <span class="current-session-score">
+                            {currentSession.score}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Score Setting Content -->
+                <div class="score-setting-content slds-m-top_medium slds-p-left_large slds-p-right_large">
+                    <template for:each={currentSessionQuestions} for:item="question">
+                        <div key={question.id} class={question.className}>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_8-of-12">
+                                    <template lwc:if={question.isChildQuestion}>
+                                        <span class="relation-mark">↳</span>
+                                    </template>
+                                    <h4 class="slds-text-heading_small dp-i">{question.text}</h4>
+                                    <p class="slds-text-body_small slds-text-color_weak">{question.type}</p>
+                                </div>
+                                <div class="slds-col slds-size_4-of-12">
+                                    <lightning-input
+                                        type="number"
+                                        label="Score"
+                                        value={question.score}
+                                        data-question-id={question.id}
+                                        onchange={handleQuestionScoreChange}
+                                        min="0"
+                                        step="0.01"
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                            
+                            <!-- Question Items for Multiple Choice Questions -->
+                            <template lwc:if={question.isMultipleChoice}>
+                                <div class="slds-m-top_small slds-p-left_large">
+                                    <h5 class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">Answer Options</h5>
+                                    <template for:each={question.questionItems} for:item="item">
+                                        <div key={item.id} class="slds-grid slds-gutters slds-m-bottom_x-small">
+                                            <div class="slds-col slds-size_7-of-12">
+                                                <p class="slds-text-body_small">{item.content}</p>
+                                            </div>
+                                            <div class="slds-col slds-size_5-of-12">
+                                                <lightning-input
+                                                    type="number"
+                                                    variant="label-hidden"
+                                                    value={item.score}
+                                                    data-question-id={question.id}
+                                                    data-item-id={item.id}
+                                                    onchange={handleQuestionItemScoreChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="Item score"
+                                                    class="item-score-input">
+                                                </lightning-input>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Session Navigation - Moved here -->
+                <div class="session-navigation slds-m-top_large slds-m-bottom_medium">
+                    <div class="session-button-group slds-text-align_center" role="group">
+                        <lightning-button
+                            variant="neutral"
+                            label="Previous Session"
+                            icon-name="utility:chevronleft"
+                            onclick={handlePreviousSession}
+                            disabled={isFirstSession}>
+                        </lightning-button>
+                        
+                        <span class="slds-p-horizontal_medium slds-text-body_regular">
+                            Session {sessionProgress}
+                        </span>
+                        
+                        <lightning-button
+                            variant="neutral"
+                            label="Next Session"
+                            icon-name="utility:chevronright"
+                            icon-position="right"
+                            onclick={handleNextSession}
+                            disabled={isLastSession}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </section>
+        </template>
+    </lightning-modal-body>
+
+    <lightning-modal-footer class="modal-footer">
+        <!-- Step 1 Footer -->
+        <template lwc:if={isStep1}>
+            <lightning-button 
+                label="Cancel" 
+                onclick={handleCancel}>
+            </lightning-button>
+            <lightning-button 
+                label="Next" 
+                variant="brand" 
+                onclick={handleNext} 
+                icon-name="utility:chevronright"
+                icon-position="right"
+                class="slds-m-left_small"
+                disabled={isNextDisabled}>
+            </lightning-button>
+        </template>
+
+        <!-- Step 2 Footer -->
+        <template lwc:if={isStep2}>
+            <lightning-button 
+                label="Previous" 
+                icon-name="utility:chevronleft" 
+
+                onclick={handlePrevious}>
+            </lightning-button>
+            <lightning-button 
+                label="Save & New" 
+                variant="neutral" 
+                onclick={handleSaveAndNew} 
+                class="slds-m-left_small"
+                disabled={isLoading}>
+            </lightning-button>
+            <lightning-button 
+                label="Save" 
+                variant="brand" 
+                onclick={handleSave} 
+                class="slds-m-left_small slds-m-right_large"
+                disabled={isLoading}>
+            </lightning-button>
+        </template>
+    </lightning-modal-footer>
+</template>

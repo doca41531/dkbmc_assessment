@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>AssessmentSheet__c</object>
+            </objects>
+        </targetConfig>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="recordId" type="String" label="Assessment Sheet ID" description="Assessment Sheet Record ID" />
+        </targetConfig>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__FlowScreen">
+            <property name="recordId" type="String" label="Assessment Sheet ID" description="Assessment Sheet Record ID" />
+        </targetConfig>
+    </targetConfigs>
+    <description>Assessment Page Component - 평가 페이지 LWC (Experience Site 지원, URL 파라미터 자동 처리)</description>
+</LightningComponentBundle>

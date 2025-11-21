@@ -1,0 +1,203 @@
+<!--
+  @description       : Lightning Modal Assessment Question Template
+  @author            : mingyu.park@dkbmc.com
+  @group             : 
+  @last modified on  : 2025-11-17
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<template>
+    <lightning-modal-header label="New Assessment Question"></lightning-modal-header>
+    
+    <lightning-modal-body>
+        <template lwc:if={isLoading}>
+            <div class="slds-align_absolute-center slds-p-around_large">
+                <lightning-spinner alternative-text="Creating Assessment Question..." size="medium"></lightning-spinner>    
+            </div>
+        </template>
+
+        <!-- Required Field Indicator -->
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+            <div></div>
+            <div class="slds-text-align_right">
+                <span class="required-mark">*</span>
+                = Required Information
+            </div>
+        </div>
+
+                <!-- Information Section -->
+        <section class="slds-m-bottom_medium">
+            <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small session-header">
+                Information
+            </h3>
+
+            <div class="slds-p-top_small slds-p-left_large slds-p-right_large">
+                <lightning-combobox
+                    label="Type"
+                    required
+                    data-field="questionType"
+                    value={formData.questionType}
+                    placeholder="Select question type..."
+                    options={questionTypeOptions}
+                    onchange={handleFieldChange}
+                    class="slds-m-bottom_medium">
+                </lightning-combobox>
+
+                <lightning-textarea
+                    label="Question"
+                    required
+                    data-field="questionText"
+                    value={formData.questionText}
+                    placeholder="Enter the assessment question..."
+                    onchange={handleFieldChange}
+                    max-length="1000"
+                    class="slds-m-bottom_medium">
+                </lightning-textarea>
+
+                <!-- Choice Options (conditionally displayed) -->
+                <template lwc:if={showChoiceOptions}>
+                    <div class="slds-form-element slds-m-bottom_medium">
+                        <label class="slds-form-element__label">
+                            <abbr class="slds-required red" title="required">*</abbr>
+                            Question Options
+                        </label>
+                        <div class="slds-form-element__control">
+                            <template for:each={formData.choiceOptions} for:item="choice" for:index="index">
+                                <div key={choice.id} class="slds-grid slds-m-bottom_x-small choice-row">
+                                    <div class="slds-col slds-size_10-of-12">
+                                        <lightning-input
+                                            type="text"
+                                            placeholder={choice.placeholder}
+                                            data-index={index}
+                                            data-id={choice.id}
+                                            value={choice.value}
+                                            variant="label-hidden"
+                                            onchange={handleChoiceChange}>
+                                        </lightning-input>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-12 slds-text-align_right">
+                                        <lightning-button-icon 
+                                            icon-name="utility:delete"
+                                            variant="border"
+                                            alternative-text="Remove"
+                                            title="Remove"
+                                            data-id={choice.id}
+                                            onclick={removeChoice}
+                                            disabled={isOnlyOneChoice}>
+                                        </lightning-button-icon>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="slds-m-top_small">
+                                <lightning-button 
+                                    label="Add Option"
+                                    variant="neutral"
+                                    onclick={addChoice}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Related Question Toggle -->
+                <lightning-input
+                    type="checkbox"
+                    label="Related Question"
+                    data-field="isRelatedQuestionEnabled"
+                    checked={formData.isRelatedQuestionEnabled}
+                    onchange={handleFieldChange}
+                    class="slds-m-bottom_medium"
+                    variant="label-stacked">
+                </lightning-input>
+
+                <!-- Related Question Configuration -->
+                <template lwc:if={formData.isRelatedQuestionEnabled}>
+                    <div class="related-question-section slds-m-top_medium slds-p-around_medium ">
+                        <!-- Parent Question Lookup -->
+                        <lightning-record-picker
+                            label="Parent Question"
+                            required
+                            object-api-name="AssessmentQuestion__c"
+                            placeholder="Search parent question..."
+                            value={formData.selectedParentQuestionId}
+                            display-info={displayInfo}
+                            matching-info={matchingInfo}
+                            onchange={handleParentQuestionPickerChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-record-picker>
+
+                        <!-- Condition Value -->
+                        <template lwc:if={isParentQuestionChoiceBased}>
+                            <template lwc:if={isLoadingChoices}>
+                                <div class="slds-form-element slds-m-bottom_small">
+                                    <label class="slds-form-element__label">
+                                        <abbr class="slds-required red" title="required">*</abbr>
+                                        Condition
+                                    </label>
+                                    <div class="slds-form-element__control">
+                                        <lightning-spinner alternative-text="Loading choices..." size="small"></lightning-spinner>
+                                    </div>
+                                </div>
+                            </template>
+                            <template lwc:else>
+                                <lightning-combobox
+                                    label="Condition"
+                                    required
+                                    data-field="selectedConditionValue"
+                                    value={formData.selectedConditionValue}
+                                    placeholder="Select condition value..."
+                                    options={parentQuestionChoices}
+                                    onchange={handleFieldChange}
+                                    class="slds-m-bottom_medium">
+                                </lightning-combobox>
+                            </template>
+                        </template>
+
+                        <template lwc:else>
+                            <lightning-input
+                                type="text"
+                                label="Condition"
+                                required
+                                data-field="selectedConditionValue"
+                                value={formData.selectedConditionValue}
+                                placeholder="Enter condition value..."
+                                onchange={handleFieldChange}
+                                class="slds-m-bottom_medium">
+                            </lightning-input>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Image Toggle -->
+                <lightning-input
+                    type="checkbox"
+                    label="Include Image"
+                    data-field="isImageEnabled"
+                    checked={formData.isImageEnabled}
+                    onchange={handleFieldChange}
+                    variant="label-stacked">
+                </lightning-input>
+            </div>
+        </section>
+    </lightning-modal-body>
+
+    <lightning-modal-footer class="modal-footer">
+        <lightning-button
+            label="Cancel"
+            onclick={handleCancel}>
+        </lightning-button>
+        <lightning-button 
+            label="Save & New" 
+            variant="neutral"
+            onclick={handleSaveAndNew}
+            class="slds-m-left_small"
+            disabled={isLoading}>
+        </lightning-button>
+        <lightning-button 
+            label="Save" 
+            variant="brand" 
+            onclick={handleSave}
+            class="slds-m-left_small slds-m-right_large"
+            disabled={isLoading}>
+        </lightning-button>
+    </lightning-modal-footer>
+</template>

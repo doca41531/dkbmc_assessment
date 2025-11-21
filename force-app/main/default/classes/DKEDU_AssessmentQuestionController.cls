@@ -187,8 +187,7 @@ public with sharing class DKEDU_AssessmentQuestionController {
             List<AssessmentQuestion__c> questions = [
                 SELECT Id, Name, Question__c, Type__c 
                 FROM AssessmentQuestion__c 
-                ORDER BY CreatedDate DESC 
-                LIMIT 100
+                ORDER BY CreatedDate DESC
             ];
             
             log('getAssessmentQuestions', 'Question query completed', questions.size());

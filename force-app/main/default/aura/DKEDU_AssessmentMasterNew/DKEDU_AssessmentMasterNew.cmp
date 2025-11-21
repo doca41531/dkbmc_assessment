@@ -1,44 +1,18 @@
 <!--
-    @description       : Assessment Question New Override - DKEDU
-    @author            : mingyu.park@dkbmc.com
-    @group             : DKEDU Aura Components  
-    @created date      : 2025-09-26
-    @last modified on  : 2025-10-15
-    @last modified by  : mingyu.park@dkbmc.com
-    @version           : 1.0.0
-    @description       : Aura wrapper component to override standard New button
-                          for Assessment Questions to use custom LWC form
-                          following DK Lab development standards
+  @description       : Assessment Master New Override Component - Updated for Lightning Modal
+  @author            : mingyu.park@dkbmc.com
+  @group             : DKEDU Aura Components  
+  @last modified on  : 2025-11-06
+  @last modified by  : mingyu.park@dkbmc.com
 -->
-<aura:component 
-    access="global" 
-    implements="flexipage:availableForAllPageTypes,lightning:actionOverride,lightning:isUrlAddressable">
-    
-    <!-- Component attributes for state management -->
-    <aura:attribute name="state" type="Object" />
+<aura:component implements="lightning:actionOverride,force:hasRecordId" access="global">
     <aura:attribute name="recordId" type="String" />
-    <aura:attribute name="objectApiName" type="String" />
     
-    <!-- Page reference handler for URL parameters -->
-    <aura:handler name="change" value="{!v.pageReference}" action="{!c.onPageReferenceChange}" />
+    <!-- LWC Wrapper Component to handle LightningModal -->
+    <c:dkedu_assessmentMasterModalWrapper aura:id="modalWrapper" 
+                                          parentRecordId="{!v.recordId}"
+                                          onnavigate="{!c.handleNavigation}" />
     
-    <!-- Embed the custom LWC component -->
-    <div class="slds-card">
-        <div class="slds-card__header slds-grid">
-            <header class="slds-media slds-media_center slds-has-flexi-truncate">
-                <div class="slds-media__body">
-                    <h2 class="slds-card__header-title">
-                        <span>새 평가 질문</span>
-                    </h2>
-                </div>
-            </header>
-        </div>
-        <div class="slds-card__body slds-card__body_inner">
-            <!-- Custom LWC Component -->
-            <c:dkedu_assessmentMaster
-                record-id="{!v.recordId}"
-                object-api-name="{!v.objectApiName}" />
-        </div>
-    </div>
-    
+    <!-- Auto-initialize when component loads -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
 </aura:component>

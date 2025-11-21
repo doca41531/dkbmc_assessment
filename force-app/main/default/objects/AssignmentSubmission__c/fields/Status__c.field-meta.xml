@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <label>Status</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Submitted</fullName>
+                <default>false</default>
+                <label>Submitted</label>
+            </value>
+            <value>
+                <fullName>GradingInProgress</fullName>
+                <default>false</default>
+                <label>Grading in Progress</label>
+            </value>
+            <value>
+                <fullName>Graded</fullName>
+                <default>false</default>
+                <label>Graded</label>
+            </value>
+            <value>
+                <fullName>ResubmissionRequired</fullName>
+                <default>false</default>
+                <label>Resubmission Required</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

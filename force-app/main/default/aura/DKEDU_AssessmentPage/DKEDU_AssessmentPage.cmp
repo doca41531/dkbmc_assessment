@@ -2,51 +2,17 @@
   @description       : 
   @author            : mingyu.park@dkbmc.com
   @group             : 
-  @last modified on  : 2025-10-20
+  @last modified on  : 2025-11-20
   @last modified by  : mingyu.park@dkbmc.com
 -->
-<aura:component controller="DKEDU_AssessmentPageController" 
-                implements="forceCommunity:availableForAllPageTypes">
+<aura:component implements="lightning:isUrlAddressable,force:appHostable" access="global">
+    <aura:attribute name="sheetId" type="String" />
     
-    <aura:attribute name="sheetId" type="String"/>
-    <aura:attribute name="assessmentData" type="Object"/>
-    <aura:attribute name="currentSectionIndex" type="Integer" default="0"/>
-    <aura:attribute name="currentSection" type="Object"/>
-    <aura:attribute name="responses" type="Map"/>
+    <!-- ⭐ Navigation Service 추가 -->
+    <lightning:navigation aura:id="navService" />
     
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    
-    <div class="assessment-container">
-        <aura:if isTrue="{!not(empty(v.assessmentData))}">
-            <div class="current-section">
-                <h2>{!v.currentSection.Name}</h2>
-                
-                <aura:iteration items="{!v.currentSection.items}" var="item" indexVar="itemIdx">
-                    <div class="question-item">
-                        <h3>문제 {!itemIdx + 1}</h3>
-                        <p>{!item.questionContent}</p>
-                        
-                        <!-- 동적 value 제거 -->
-                        <lightning:input aura:id="{!item.Id}"
-                                       name="{!item.Id}"
-                                       label="답안을 입력하세요"
-                                       onchange="{!c.handleResponse}"/>
-                    </div>
-                </aura:iteration>
-            </div>
-            
-            <div class="navigation-buttons">
-                <lightning:button label="이전" 
-                                onclick="{!c.previousSection}"
-                                disabled="{!v.currentSectionIndex == 0}"/>
-                
-                <lightning:button label="다음" 
-                                onclick="{!c.nextSection}"/>
-                
-                <lightning:button label="제출" 
-                                onclick="{!c.submitAssessment}"
-                                variant="brand"/>
-            </div>
-        </aura:if>
-    </div>
+    <!-- LWC Component with Navigation Event Handler -->
+    <c:dkedu_assessmentPageComponent 
+        recordId="{!v.sheetId}" 
+        onnavigate="{!c.handleNavigate}" />
 </aura:component>

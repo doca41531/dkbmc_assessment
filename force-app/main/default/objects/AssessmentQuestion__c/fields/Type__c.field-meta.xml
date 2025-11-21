@@ -25,9 +25,9 @@
                 <label>Multi Choosable</label>
             </value>
             <value>
-                <fullName>Start Rating</fullName>
+                <fullName>Star Rating</fullName>
                 <default>false</default>
-                <label>Start Rating</label>
+                <label>Star Rating</label>
             </value>
             <value>
                 <fullName>Number Point</fullName>

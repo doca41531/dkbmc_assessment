@@ -1,16 +1,19 @@
 <!--
-  @description       : Assessment Page Button for Record Page
+  @description       : Assessment Page Button for Record Page with Dynamic URL
   @author            : mingyu.park@dkbmc.com
   @group             : 
-  @last modified on  : 2025-10-21
+  @last modified on  : 2025-11-20
   @last modified by  : mingyu.park@dkbmc.com
 -->
-<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+<aura:component controller="DKEDU_AssessmentPageController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
     
     <aura:attribute name="recordId" type="String" />
     <aura:attribute name="isLoading" type="Boolean" default="false"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!-- Lightning Navigation Service (선택적 사용) -->
+    <lightning:navigation aura:id="navService" />
     
     <div class="slds-p-around_medium">
         <div class="slds-text-align_center">

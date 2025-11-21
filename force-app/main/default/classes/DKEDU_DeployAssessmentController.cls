@@ -2,7 +2,7 @@
  * @description       : Assessment Sheet 배포 컨트롤러 - 중복 방지 및 Target 할당 로직 포함
  * @author            : mingyu.park@dkbmc.com
  * @group             : 
- * @last modified on  : 2025-10-21
+ * @last modified on  : 2025-11-20
  * @last modified by  : mingyu.park@dkbmc.com
 **/
 public with sharing class DKEDU_DeployAssessmentController {
@@ -198,7 +198,7 @@ public with sharing class DKEDU_DeployAssessmentController {
                     AssessmentSheetItem__c sheetItem = new AssessmentSheetItem__c();
                     sheetItem.AssessmentResultSection__c = sheetSectionId;
                     sheetItem.AssessmentTemplateQuestion__c = tempQuestion.Id;
-                    sheetItem.Score__c = tempQuestion.Score__c;
+                    sheetItem.Score__c = 0;
                     sheetItems.add(sheetItem);
                 }
             }

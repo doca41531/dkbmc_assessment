@@ -1,0 +1,192 @@
+<!--
+  @description       : Lightning Modal Assessment Grade Template
+  @author            : salesforce.consultant@company.com
+  @group             : Assessment Management
+  @last modified on  : 2025-11-17
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<template>
+    <lightning-modal-header label="New Assessment Grade"></lightning-modal-header>
+
+    <lightning-modal-body>
+        <template lwc:if={isLoading}>
+            <div class="slds-align_absolute-center slds-p-around_large">
+                <lightning-spinner alternative-text="Creating Assessment Grade..." size="medium"></lightning-spinner>    
+            </div>
+        </template>
+
+        <!-- Required Field Indicator -->
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+            <div></div>
+            <div class="slds-text-align_right">
+                <span class="required-mark">*</span>
+                = Required Information
+            </div>
+        </div>
+
+        <!-- Basic Information Section -->
+        <section class="slds-m-bottom_medium">
+            <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small session-header">
+                Grade Configuration
+            </h3>
+
+            <div class="slds-p-top_small slds-p-left_large slds-p-right_large">
+                <!-- Grade Name -->
+                <lightning-input
+                    label="Assessment Grade Name"
+                    required
+                    data-field="gradeName"
+                    value={formData.gradeName}
+                    placeholder="Enter grade name"
+                    onchange={handleFieldChange}
+                    class="slds-m-bottom_medium">
+                </lightning-input>
+
+                <!-- Active Status -->
+                <lightning-input
+                    type="checkbox"
+                    label="Is Active"
+                    data-field="isActive"
+                    checked={formData.isActive}
+                    onchange={handleFieldChange}
+                    variant="label-stacked"
+                    class="slds-m-bottom_medium">
+                </lightning-input>
+            </div>
+        </section>
+
+        <!-- Grade Items Section -->
+        <section class="slds-m-bottom_medium">
+            <div class="slds-theme_shade slds-grid_vertical-align-center slds-grid slds-grid_align-spread slds-m-bottom_small slds-p-around_small session-header">
+                <div class="slds-col">
+                    <h3 class="slds-text-heading_small fs-15">
+                        Grade Items
+                    </h3>
+                </div>
+                <lightning-button
+                    label="Add Grade Item"
+                    variant="neutral"
+                    size="small"
+                    onclick={addGradeItem}
+                    class="slds-m-left_medium">
+                </lightning-button>
+            </div>
+
+            <div class="slds-p-top_small slds-p-left_large slds-p-right_large">
+                <template lwc:if={hasGradeItems}>
+                    <!-- Grade Items Table -->
+                    <div class="slds-m-bottom_medium">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th class="slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Grade Name">Grade Name <span class="required-mark">*</span></div>
+                                    </th>
+                                    <th class="slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Lowest Score">Lowest Score <span class="required-mark">*</span></div>
+                                    </th>
+                                    <th class="slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Highest Score">Highest Score <span class="required-mark">*</span></div>
+                                    </th>
+                                    <th class="slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Actions">Actions</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={formData.gradeItems} for:item="item" for:index="index">
+                                    <tr key={item.id} class="slds-hint-parent">
+                                        <td data-label="Grade Name">
+                                            <lightning-input
+                                                type="text"
+                                                value={item.gradeName}
+                                                placeholder="Enter grade"
+                                                data-index={index}
+                                                data-field="gradeName"
+                                                onchange={handleGradeItemChange}
+                                                variant="label-hidden"
+                                                class="grade-item-input">
+                                            </lightning-input>
+                                        </td>
+                                        <td data-label="Lowest Score">
+                                            <lightning-input
+                                                type="number"
+                                                value={item.lowestScore}
+                                                placeholder="0"
+                                                min="0"
+                                                max="100"
+                                                step="0.1"
+                                                data-index={index}
+                                                data-field="lowestScore"
+                                                onchange={handleGradeItemChange}
+                                                variant="label-hidden"
+                                                class="grade-item-input">
+                                            </lightning-input>
+                                        </td>
+                                        <td data-label="Highest Score">
+                                            <lightning-input
+                                                type="number"
+                                                value={item.highestScore}
+                                                placeholder="100"
+                                                min="0"
+                                                max="100"
+                                                step="0.1"
+                                                data-index={index}
+                                                data-field="highestScore"
+                                                onchange={handleGradeItemChange}
+                                                variant="label-hidden"
+                                                class="grade-item-input">
+                                            </lightning-input>
+                                        </td>
+                                        <td data-label="Actions">
+                                            <lightning-button-icon 
+                                                icon-name="utility:delete"
+                                                variant="border-filled"
+                                                alternative-text="Remove"
+                                                title="Remove"
+                                                data-index={index}
+                                                onclick={removeGradeItem}
+                                                disabled={isOnlyOneGradeItem}>
+                                            </lightning-button-icon>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </template>
+
+                <template lwc:else>
+                    <div class="slds-text-align_center slds-p-around_large">
+                        <div class="slds-text-color_weak">
+                            <lightning-icon icon-name="utility:adduser" size="large" class="slds-m-bottom_small"></lightning-icon>
+                            <p>No grade items defined yet.</p>
+                            <p>Click "Add Grade Item" to create your first grade level.</p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </lightning-modal-body>
+
+    <lightning-modal-footer class="modal-footer">
+        <lightning-button
+            label="Cancel"
+            onclick={handleCancel}>
+        </lightning-button>
+        <lightning-button 
+            label="Save & New" 
+            variant="neutral"
+            onclick={handleSaveAndNew}
+            class="slds-m-left_small"
+            disabled={isLoading}>
+        </lightning-button>
+        <lightning-button 
+            label="Save" 
+            variant="brand" 
+            onclick={handleSave}
+            class="slds-m-left_small slds-m-right_large"
+            disabled={isLoading}>
+        </lightning-button>
+    </lightning-modal-footer>
+</template>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Minimal Assessment permissions excluding all required fields</description>
+    <label>Assessment Minimal Access</label>
+    
+    <!-- ======================================= -->
+    <!-- 선택적(Optional) 필드 권한만 포함        -->
+    <!-- ======================================= -->
+    
+    <!-- Assessment Master - 선택적 필드만 -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentMaster__c.IsActive__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentMaster__c.Description__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentMaster__c.AssessmentStartDate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentMaster__c.AssessmentEndDate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    
+    <!-- Template Question - 선택적 필드만 (Question__c만) -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentTemplateQuestion__c.Question__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentTemplateQuestion__c.IsActive__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- Order__c와 Type__c는 필수 필드이므로 제외 -->
+    
+    <!-- Template Question Item - Content만 (Order__c 제외) -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentTemplateQuestionItem__c.Content__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- Order__c는 필수 필드이므로 제외 -->
+
+    <!-- Assessment Sheet Item - Answer만 (나머지 필수 필드들 제외) -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>AssessmentSheetItem__c.Answer__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentSheetItem__c.Score__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- AssessmentTemplateQuestion__c, AssessmentResultSection__c는 필수 필드이므로 제외 -->
+
+    <!-- Assessment Sheet - 선택적 필드만 -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentSheet__c.Description__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentSheet__c.TotalScore__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentSheet__c.Grade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- Status__c, AssessmentMasterId__c는 필수 필드이므로 제외 -->
+
+    <!-- Assessment Sheet Section - 선택적 필드만 -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>AssessmentSheetSection__c.Score__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- SequenceOrder__c, Status__c, AssessmentTemplateGroup__c는 필수 필드이므로 제외 -->
+
+    <!-- ======================================= -->
+    <!-- 객체 권한 - 모든 필수 필드 자동 처리      -->
+    <!-- ======================================= -->
+
+    <!-- 의존성 객체들 - READ ONLY -->
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentMaster__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentTemplate__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentTarget__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentTemplateQuestion__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentTemplateQuestionItem__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentTemplateSection__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- 핵심 객체들 - 편집 가능 -->
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentSheet__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentSheetSection__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>AssessmentSheetItem__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- ======================================= -->
+    <!-- Apex Classes                           -->
+    <!-- ======================================= -->
+    
+    <classAccesses>
+        <apexClass>DKEDU_AssessmentPageController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    
+</PermissionSet>

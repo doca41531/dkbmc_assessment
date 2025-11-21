@@ -1,0 +1,251 @@
+/* Modal Container - 애니메이션 개선 */
+.slds-modal {
+    animation: modalSlideIn 0.2s ease-out;
+    transform: translateY(0);
+}
+
+.slds-modal__container {
+    animation: containerFadeIn 0.2s ease-out;
+    transform: translateY(0);
+    position: relative;
+}
+
+.slds-modal__header {
+    position: relative;
+    transform: translateY(0);
+    animation: none;
+}
+
+lightning-input[type="checkbox"] {
+    --slds-c-checkbox-label-text-font-weight: bold;
+}
+
+
+/* 애니메이션 정의 */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes containerFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 백드롭 애니메이션 */
+.slds-backdrop {
+    animation: backdropFadeIn 0.2s ease-out;
+}
+
+.modal-footer{
+    --slds-c-modal-radius-border: none;
+}
+
+.required-mark{
+    color: #c23934; 
+    font-size: 13px; 
+    font-weight: bold; 
+    margin-right: 0.25rem;
+}
+
+.session-header{
+    border-radius: 0.5rem;
+    font-size: 20px;
+    padding: 0.25rem 0.75rem;
+}
+
+.red{
+    color: #c23934;
+}
+
+.session-header{
+    border-radius: 0.5rem;
+    font-size: 20px;
+    padding: 0.25rem 0.75rem;
+}
+
+@keyframes backdropFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.8;
+    }
+}
+
+/* Form Content Styling */
+.form-container {
+    padding: 1rem 0;
+}
+
+.slds-p-horizontal_small, .slds-p-horizontal--small{
+    padding-inline: 0;
+}
+
+.slds-modal__footer{
+    border-radius: none;
+}
+
+/* Loading Spinner */
+.slds-spinner_container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Form Field Styling */
+lightning-textarea,
+lightning-combobox,
+lightning-input,
+lightning-input-field {
+    margin-bottom: 0.5rem;
+}
+
+/* Required Field Indicator */
+.required-field .slds-form-element__label::after {
+    content: " *";
+    color: #c23934;
+    font-weight: bold;
+}
+
+/* Field Spacing */
+.slds-col {
+    padding: 0.25rem;
+    padding-left:0;
+}
+
+.slds-grid{
+    align-items: start;
+}
+
+/* Custom Input Styling */
+lightning-input[type="number"] {
+    max-width: 200px;
+}
+
+lightning-textarea[data-field="questionText"],
+lightning-textarea[data-field="explanation"] {
+    min-height: 100px;
+}
+
+/* Checkbox Styling */
+lightning-input[type="checkbox"] {
+    margin-top: 1rem;
+}
+
+/* Related Question Section */
+.related-question-section {
+    background: #f3f2f2;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slds-col {
+        width: 100% !important;
+        padding: 0.5rem 0;
+    }
+    
+    .form-container {
+        padding: 0.5rem;
+    }
+    
+    .slds-modal__container {
+        margin: 0.5rem;
+        max-height: calc(100vh - 1rem);
+    }
+}
+/* Error State Styling */
+.slds-has-error lightning-input,
+.slds-has-error lightning-textarea,
+.slds-has-error lightning-combobox {
+    border-color: #c23934;
+}
+
+/* Custom Button Styling in Footer */
+lightning-modal-footer lightning-button {
+    min-width: 80px;
+}
+
+/* Grid Layout Improvements */
+.slds-grid.slds-gutters {
+    margin: 0 -0.5rem;
+}
+
+.slds-grid.slds-gutters .slds-col {
+    padding: 0 0.5rem;
+}
+
+/* Choice Options Styling */
+.choice-row {
+    align-items: center;
+}
+
+.choice-row lightning-input {
+    margin-bottom: 0;
+}
+
+/* Modal 크기 조정 */
+.slds-modal__container {
+    width: 50rem;
+    max-width: 90vw;
+}
+
+/* 헤더 고정 */
+.slds-modal__header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* 콘텐츠 스크롤 */
+.slds-modal__content {
+    max-height: calc(90vh - 8rem);
+    overflow-y: auto;
+}
+
+/* 푸터 고정 */
+.slds-modal__footer {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    z-index: 100;
+}

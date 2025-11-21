@@ -1,0 +1,321 @@
+<!--
+  @description       : 
+  @author            : mingyu.park@dkbmc.com
+  @group             : 
+  @last modified on  : 2025-11-20
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<template>
+    <div class="assessment-container slds-p-around_medium">
+        <!-- 로딩 스피너 -->
+        <template if:true={isLoading}>
+            <div class="slds-text-align_center">
+                <lightning-spinner alternative-text="시험 데이터를 로드하는 중..." size="medium"></lightning-spinner>
+                <p class="slds-text-body_regular slds-m-top_medium">
+                    시험 데이터를 로드하는 중입니다...
+                </p>
+            </div>
+        </template>
+
+        <!-- 평가 내용 -->
+        <template if:true={hasAssessmentData}>
+            <!-- ⚠ Complete 상태 알림 -->
+            <template if:true={isCompleted}>
+                <template if:false={isGradingMode}>
+                    <div class="slds-notify slds-notify_alert slds-theme_info slds-m-bottom_medium" role="alert">
+                        <div class="slds-notify__content">
+                            <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_small"></lightning-icon>
+                            <h2 class="slds-text-heading_small">
+                                이미 완료된 시험입니다. 읽기 전용 모드로 표시됩니다.
+                            </h2>
+                        </div>
+                    </div>
+                </template>
+            </template>
+            
+            <!-- ⭐ 채점 모드 알림 -->
+            <template if:true={isGradingMode}>
+                <div class="slds-notify slds-notify_alert slds-theme_warning slds-m-bottom_medium" role="alert">
+                    <div class="slds-notify__content">
+                        <lightning-icon icon-name="utility:edit" size="x-small" class="slds-m-right_small"></lightning-icon>
+                        <h2 class="slds-text-heading_small">
+                            🎯 채점 모드 - 완료된 시험을 채점하고 있습니다
+                        </h2>
+                        <p class="slds-text-body_small slds-m-top_x-small">
+                            답변을 확인하고 점수를 부여할 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </template>
+
+            <!-- 진행 상황 표시 -->
+            <div class="slds-progress-bar slds-progress-bar_medium slds-m-bottom_large" role="progressbar" 
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressValue}>
+                <span class="slds-progress-bar__value" style={progressBarStyle}>
+                    <span class="slds-assistive-text">진행률 {progressValue}%</span>
+                </span>
+            </div>
+
+            <!-- 섹션 진행 상황 -->
+            <div class="section-progress slds-m-bottom_large">
+                <p class="slds-text-body_small slds-text-color_weak">
+                    섹션 {currentSectionIndex} / {assessmentData.sections.length}
+                </p>
+            </div>
+
+            <!-- 현재 섹션 표시 -->
+            <div class="current-section slds-card slds-p-around_medium">
+                <header class="slds-card__header">
+                    <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title slds-text-heading_medium">
+                                <lightning-icon icon-name="utility:quiz" size="small" class="slds-m-right_small"></lightning-icon>
+                                {currentSection.Name}
+                            </h2>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- 현재 섹션의 문항들 표시 -->
+                <div class="slds-card__body slds-card__body_inner">
+                    <template if:true={currentQuestions}>
+                        <template for:each={currentQuestions} for:item="item">
+                            <div key={item.Id} class="question-item slds-box slds-m-bottom_medium">
+                                <div class="question-header slds-grid slds-grid_align-spread slds-m-bottom_small">
+                                    <div class="slds-text-heading_small">
+                                        문제 {item.displayIndex}
+                                    </div>
+                                    <div class="slds-text-body_small slds-text-color_weak">
+                                        {item.questionType}
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-text-body_regular slds-m-bottom_medium question-content">
+                                    {item.questionContent}
+                                </div>
+                                
+                                <!-- 입력 필드 - 질문 유형별로 다른 컴포넌트 사용 -->
+                                <div class="answer-input">
+                                    <!-- ⭐ 채점 모드: 기존 답변 표시 + 점수 입력 -->
+                                    <template if:true={isGradingMode}>
+                                        <div class="grading-section slds-border_top slds-p-top_medium">
+                                            <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                                📝 제출된 답변
+                                            </h4>
+                                            <div class="submitted-answer slds-box slds-p-around_small slds-m-bottom_medium" style="background-color: #f3f2f2;">
+                                                <template if:true={item.submittedAnswer}>
+                                                    <p class="slds-text-body_regular">{item.submittedAnswer}</p>
+                                                </template>
+                                                <template if:false={item.submittedAnswer}>
+                                                    <p class="slds-text-color_weak slds-text-body_small">답변이 제출되지 않았습니다.</p>
+                                                </template>
+                                            </div>
+                                            
+                                            <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                                🎯 점수 부여
+                                            </h4>
+                                            <lightning-input 
+                                                data-id={item.Id}
+                                                data-field-type="score"
+                                                name={item.Id}
+                                                type="number"
+                                                label="점수 (0-100)"
+                                                value={item.scoreValue}
+                                                min="0"
+                                                max="100"
+                                                step="1"
+                                                onchange={handleScoreChange}
+                                                variant="label-stacked"
+                                                class="slds-form-element_stacked">
+                                            </lightning-input>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- ⭐ 일반 모드: 기존 답변 입력 필드들 -->
+                                    <template if:false={isGradingMode}>
+                                        <!-- Short Answer -->
+                                    <template if:true={item.isShortAnswer}>
+                                        <lightning-input 
+                                            data-id={item.Id}
+                                            data-question-type={item.questionType}
+                                            name={item.Id}
+                                            label="답안을 입력하세요"
+                                            value={item.inputValue}
+                                            variant="label-stacked"
+                                            onchange={handleResponse}
+                                            disabled={isReadOnly}
+                                            class="slds-form-element_stacked">
+                                        </lightning-input>
+                                    </template>
+
+                                    <!-- Number Point -->
+                                    <template if:true={item.isNumberPoint}>
+                                        <lightning-input 
+                                            data-id={item.Id}
+                                            data-question-type={item.questionType}
+                                            name={item.Id}
+                                            type="number"
+                                            label="점수를 입력하세요"
+                                            value={item.inputValue}
+                                            variant="label-stacked"
+                                            onchange={handleResponse}
+                                            disabled={isReadOnly}
+                                            class="slds-form-element_stacked">
+                                        </lightning-input>
+                                    </template>
+
+                                    <!-- Choosable (단일 선택) -->
+                                    <template if:true={item.isChoosable}>
+                                        <lightning-radio-group
+                                            data-id={item.Id}
+                                            data-question-type={item.questionType}
+                                            name={item.Id}
+                                            label="선택하세요"
+                                            options={item.options}
+                                            onchange={handleResponse}
+                                            disabled={isReadOnly}
+                                            variant="label-stacked">
+                                        </lightning-radio-group>
+                                    </template>
+
+                                    <!-- Multi Choosable (다중 선택) -->
+                                    <template if:true={item.isMultiChoosable}>
+                                        <fieldset class="slds-form-element">
+                                            <legend class="slds-form-element__legend slds-form-element__label">선택하세요 (여러 개 가능)</legend>
+                                            <div class="slds-form-element__control">
+                                                <template for:each={item.options} for:item="option">
+                                                    <span key={option.value} class="Multi-choosable-flex">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            data-id={item.Id}
+                                                            data-question-type={item.questionType}
+                                                            value={option.value}
+                                                            id={option.uniqueId}
+                                                            disabled={isReadOnly}
+                                                            class="Multi-choosable-input"
+                                                            onchange={handleResponse} />
+                                                        <label class="slds-checkbox__label" for={option.uniqueId}>
+                                                            <span class="slds-checkbox__faux"></span>
+                                                            <span class="slds-form-element__label">{option.label}</span>
+                                                        </label>
+                                                    </span>
+                                                </template>
+                                            </div>
+                                        </fieldset>
+                                    </template>
+
+                                    <!-- Star Rating -->
+                                    <template if:true={item.isStarRating}>
+                                        <fieldset class="slds-form-element">
+                                            <legend class="slds-form-element__legend slds-form-element__label">별점을 선택하세요</legend>
+                                            <div class="slds-form-element__control star-rating-container">
+                                                <template for:each={item.starOptions} for:item="star">
+                                                    <span key={star.value} class="star-rating-item">
+                                                        <input 
+                                                            type="radio" 
+                                                            data-id={item.Id}
+                                                            data-question-type={item.questionType}
+                                                            name={item.Id}
+                                                            value={star.value}
+                                                            id={star.uniqueId}
+                                                            disabled={isReadOnly}
+                                                            onchange={handleResponse} />
+                                                        <label class="star-rating-label" for={star.uniqueId}>
+                                                            <lightning-icon icon-name="utility:favorite" size="medium" class="star-icon"></lightning-icon>
+                                                            <span class="star-label">{star.label}</span>
+                                                        </label>
+                                                    </span>
+                                                </template>
+                                            </div>
+                                        </fieldset>
+                                    </template>
+                                    </template> <!-- ⭐ 일반 모드 template 닫는 태그 -->
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- 문항이 없는 경우 -->
+                    <template if:false={currentQuestions}>
+                        <div class="slds-text-align_center slds-p-vertical_large">
+                            <lightning-icon icon-name="utility:info" size="medium" variant="warning"></lightning-icon>
+                            <p class="slds-text-body_regular slds-m-top_medium">
+                                이 섹션에는 문항이 없습니다.
+                            </p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- 네비게이션 버튼 -->
+            <div class="navigation-buttons slds-text-align_center slds-m-top_large">
+                <div class="slds-button-group" role="group">
+                    <lightning-button 
+                        label="이전" 
+                        icon-name="utility:chevronleft"
+                        onclick={previousSection}
+                        disabled={isPreviousDisabled}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    
+                    <lightning-button 
+                        label="다음" 
+                        icon-name="utility:chevronright"
+                        icon-position="right"
+                        onclick={nextSection}
+                        disabled={isNextDisabled}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    
+                    <!-- ⭐ Complete 상태일 때 제출 버튼 숨김 -->
+                    <template if:false={isCompleted}>
+                        <lightning-button 
+                            label="제출" 
+                            icon-name="utility:check"
+                            onclick={submitAssessmentHandler}
+                            variant="brand"
+                            disabled={isSubmitDisabled}
+                            class="slds-m-left_small">
+                        </lightning-button>
+                    </template>
+                    
+                    <!-- ⭐ Complete 상태일 때 완료 표시 -->
+                    <template if:true={isCompleted}>
+                        <lightning-button 
+                            label="완료됨" 
+                            icon-name="utility:success"
+                            variant="neutral"
+                            disabled="true"
+                            class="slds-m-left_small">
+                        </lightning-button>
+                    </template>
+                </div>
+                
+                <!-- 제출 중 스피너 -->
+                <template if:true={isSubmitting}>
+                    <div class="slds-m-top_medium">
+                        <lightning-spinner alternative-text="제출 중..." size="small"></lightning-spinner>
+                        <p class="slds-text-body_small slds-m-top_x-small">
+                            시험을 제출하고 있습니다...
+                        </p>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- 데이터 없음 상태 -->
+        <template if:false={hasAssessmentData}>
+            <template if:false={isLoading}>
+                <div class="slds-text-align_center slds-p-around_large">
+                    <lightning-icon icon-name="utility:warning" size="large" variant="warning"></lightning-icon>
+                    <h3 class="slds-text-heading_medium slds-m-top_medium">
+                        평가 데이터를 찾을 수 없습니다
+                    </h3>
+                    <p class="slds-text-body_regular slds-m-top_small">
+                        올바른 평가 링크인지 확인해주세요.
+                    </p>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

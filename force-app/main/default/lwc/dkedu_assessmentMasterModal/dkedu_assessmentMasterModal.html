@@ -1,0 +1,285 @@
+<!--
+  @description       : Lightning Modal Assessment Master Template
+  @author            : mingyu.park@dkbmc.com
+  @group             : DKEDU Components
+  @last modified on  : 2025-11-13
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<template>
+    <lightning-modal-header label="New Assessment Master"></lightning-modal-header>
+    
+    <lightning-modal-body>
+        <template lwc:if={isLoading}>
+            <div class="slds-align_absolute-center slds-p-around_large">
+                <lightning-spinner alternative-text="Creating Assessment Master..." size="medium"></lightning-spinner>    
+            </div>
+        </template>
+
+        <!-- Required Field Indicator -->
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+            <div></div>
+            <div class="slds-text-align_right">
+                <span class="required-mark">*</span>
+                = Required Information
+            </div>
+        </div>
+
+        <!-- Basic Information Section -->
+        <section>
+                <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small session-header">
+                    Information
+                </h3>
+
+            <div class="slds-p-top_small slds-p-left_large slds-p-right_large">
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <!-- Master Name -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-input
+                            type="text"
+                            label="Master Name"
+                            required
+                            data-field="masterName"
+                            value={formData.masterName}
+                            placeholder="Enter master name"
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-input>
+                    </div>
+
+                    <!-- IsActive Checkbox -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-input
+                            type="checkbox"
+                            label="Is Active"
+                            data-field="isActive"
+                            checked={formData.isActive}
+                            onchange={handleFieldChange}
+                            variant="label-stacked"
+                            class="slds-m-bottom_medium">
+                        </lightning-input>
+                    </div>
+
+                    <!-- Start Date -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-input
+                            type="date"
+                            label="Start Date"
+                            required
+                            data-field="startDate"
+                            value={formData.startDate}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-input>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-input
+                            type="date"
+                            label="End Date"
+                            required
+                            data-field="endDate"
+                            value={formData.endDate}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-input>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-textarea
+                            label="Description"
+                            data-field="description"
+                            value={formData.description}
+                            placeholder="Enter description"
+                            onchange={handleFieldChange}
+                            max-length="1000"
+                            class="slds-m-bottom_medium">
+                        </lightning-textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment Configuration Section -->
+        <section class="slds-m-bottom_medium slds-p-left_large slds-p-right_large">
+            <div class="slds-p-horizontal_small slds-p-top_small">
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <!-- Assessment Template -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-combobox
+                            label="Assessment Template"
+                            required
+                            data-field="assessmentTemplateId"
+                            value={formData.assessmentTemplateId}
+                            placeholder="Search templates..."
+                            options={templateOptions}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-combobox>
+                    </div>
+
+                    <!-- Assessment Grade -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-combobox
+                            label="Assessment Grade"
+                            required
+                            data-field="assessmentGradeId"
+                            value={formData.assessmentGradeId}
+                            placeholder="Search grades..."
+                            options={gradeOptions}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-combobox>
+                    </div>
+
+                    <!-- Assessment Type -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-combobox
+                            label="Assessment Type"
+                            required
+                            data-field="assessmentType"
+                            value={formData.assessmentType}
+                            placeholder="Choose an assessment type..."
+                            options={assessmentTypeOptions}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-combobox>
+                    </div>
+
+                    <!-- Assign Type -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                        <lightning-combobox
+                            label="Assign Type"
+                            required
+                            data-field="assignType"
+                            value={formData.assignType}
+                            placeholder="Choose an assign type..."
+                            options={assignTypeOptions}
+                            onchange={handleFieldChange}
+                            class="slds-m-bottom_medium">
+                        </lightning-combobox>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assessment Target Section (Manual Only) -->
+        <template lwc:if={isManualAssign}>
+            <section class="slds-m-bottom_medium">
+                <h3 class="slds-text-heading_small slds-theme_shade slds-p-around_small session-header">
+                    Assessment Target
+                </h3>
+
+                <div class="contact-search-section slds-p-left_large slds-p-right_large">
+                    <!-- Contact Search -->
+                    <lightning-input
+                        type="search"
+                        label="Search Contacts"
+                        required
+                        data-field="contactSearchTerm"
+                        value={formData.contactSearchTerm}
+                        placeholder="Search contacts by name..."
+                        onchange={handleContactSearch}
+                        class="slds-m-bottom_medium">
+                    </lightning-input>
+
+                    <!-- Search Results -->
+                    <template lwc:if={hasSearchResults}>
+                        <div class="slds-m-bottom_medium">
+                            <h4 class="slds-text-heading_small slds-m-bottom_small">Search Results</h4>
+                            <template for:each={searchResults} for:item="contact">
+                                <div key={contact.id} class="slds-card slds-card_boundary slds-m-bottom_x-small">
+                                    <div class="slds-card__body slds-card__body_inner">
+                                        <div class="slds-grid slds-grid_align-spread">
+                                            <div class="slds-col">
+                                                <strong>{contact.name}</strong>
+                                                <div class="slds-text-body_small slds-text-color_weak">
+                                                    {contact.email} • {contact.account}
+                                                </div>
+                                            </div>
+                                            <div class="slds-col slds-no-flex">
+                                                <lightning-button
+                                                    label="Select"
+                                                    variant="brand"
+                                                    size="small"
+                                                    data-contact-id={contact.id}
+                                                    onclick={selectContact}>
+                                                </lightning-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Selected Targets -->
+                    <template lwc:if={hasSelectedTargets}>
+                        <div class="selected-targets-container">
+                            <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                Selected Targets ({selectedTargetCount})
+                            </h4>
+                            <div class="slds-grid slds-gutters slds-wrap">
+                                <template for:each={formData.selectedTargets} for:item="target">
+                                    <div key={target.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3">
+                                        <div class="slds-card slds-card_boundary">
+                                            <div class="slds-card__body slds-card__body_inner">
+                                                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                                                    <div class="slds-col mw-0 f1">
+                                                        <div class="slds-truncate wb-ka">
+                                                            <strong class="target-name" title={target.name}>
+                                                                {target.name}
+                                                            </strong>
+                                                        </div>
+                                                        <template lwc:if={target.email}>
+                                                            <div class="slds-text-body_small slds-text-color_weak slds-truncate ml-small" 
+                                                                 title={target.email}>
+                                                                {target.email}
+                                                            </div>
+                                                        </template>
+                                                        <template lwc:if={target.account}>
+                                                            <div class="slds-text-body_small slds-text-color_weak slds-truncate ml-middle" 
+                                                                 title={target.account}>
+                                                                {target.account}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                    <div class="slds-col slds-no-flex ml-large">
+                                                        <lightning-button-icon
+                                                            icon-name="utility:close"
+                                                            variant="border-filled"
+                                                            alternative-text="Remove target"
+                                                            title="Remove target"
+                                                            size="small"
+                                                            data-contact-id={target.id}
+                                                            onclick={removeTarget}>
+                                                        </lightning-button-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </template>
+    </lightning-modal-body>
+
+    <lightning-modal-footer class="modal-footer">
+        <lightning-button
+            label="Cancel"
+            onclick={handleCancel}>
+        </lightning-button>
+        <lightning-button 
+            label="Save" 
+            variant="brand" 
+            class="slds-m-left_small slds-m-right_large"
+            onclick={handleSave}
+            disabled={isLoading}>
+        </lightning-button>
+    </lightning-modal-footer>
+</template>

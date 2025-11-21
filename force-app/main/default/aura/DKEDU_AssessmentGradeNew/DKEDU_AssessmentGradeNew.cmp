@@ -1,0 +1,18 @@
+<!--
+  @description       : Assessment Grade New Override Component
+  @author            : salesforce.consultant@company.com
+  @group             : Assessment Management
+  @last modified on  : 2025-11-17
+  @last modified by  : mingyu.park@dkbmc.com
+-->
+<aura:component implements="lightning:actionOverride,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="String" />
+    
+    <!-- LWC Wrapper Component to handle LightningModal -->
+    <c:dkedu_assessmentGradeModalWrapper aura:id="gradeModalWrapper" 
+                                        parentRecordId="{!v.recordId}"
+                                        onnavigate="{!c.handleNavigation}" />
+    
+    <!-- Auto-initialize when component loads -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+</aura:component>

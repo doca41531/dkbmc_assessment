@@ -9,6 +9,7 @@
         <targetConfig targets="lightning__RecordPage">
             <objects>
                 <object>AssessmentTemplate__c</object>
+                <object>AssessmentMaster__c</object>
             </objects>
         </targetConfig>
     </targetConfigs>

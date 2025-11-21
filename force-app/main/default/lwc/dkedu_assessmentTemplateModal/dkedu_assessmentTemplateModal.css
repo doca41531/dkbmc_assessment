@@ -1,0 +1,88 @@
+/* Assessment Template Modal Styles */
+
+.question-score-row {
+    padding: 1rem;
+    border: 1px solid #e0e5ee;
+}
+
+.child-question {
+    margin-left: 2rem;
+    background-color: #f3f3f3;
+}
+
+.item-score-input {
+    max-width: 150px;
+}
+
+.session-navigation {
+    border-top: 1px solid #e0e5ee;
+    padding-top: 1rem;
+    margin-bottom: 0 !important;
+    display: flex;
+    justify-content: center;
+}
+
+.modal-footer {
+    margin-top: 0 !important;
+}
+
+.session-button-group{
+    display: inline-flex;
+    align-items: center;
+}
+
+.required-mark{
+    color: #c23934; 
+    font-size: 13px; 
+    font-weight: bold; 
+    margin-right: 0.25rem;
+}
+
+.mb-large{
+    margin-bottom: 0.5rem;
+}
+
+.dp-i{
+    display: inline;
+}
+
+.relation-mark{
+    color: #706e6b; 
+    margin-right: 8px; 
+    font-size: 18px;
+}
+
+.session-header{
+    border-radius: 0.5rem;
+    font-size: 20px;
+    padding: 0.25rem 0.75rem;
+}
+
+
+.search-field{
+    border: 1px solid #c9c9c9;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    background: white;
+}
+
+.session-score{
+    font-size: 14px; 
+    font-weight: 600; 
+    color: #080707;
+}
+
+.current-session-score{
+    font-size: 14px;
+    font-weight: bold;
+    color: #0176d3;
+}
+/* Remove extra spacing between modal body and footer */
+lightning-modal-body {
+    padding-bottom: 0 !important;
+}
+
+lightning-modal-footer {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}

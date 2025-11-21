@@ -1,0 +1,3 @@
+<design:component label="DKEDU Assessment Question New">
+    <design:attribute name="recordId" label="Record ID" description="The record ID for context" />
+</design:component>
