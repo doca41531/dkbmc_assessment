@@ -522,20 +522,28 @@ public with sharing class DKEDU_AssessmentTemplateController {
     
     /**
      * @description Get available Assessment Questions for template creation
-     * @return List<AssessmentQuestion__c> - List of active questions without related questions
+     * @return List<AssessmentQuestion__c> - List of active questions for dual box Available Questions
      */
     @AuraEnabled(cacheable=true)
     public static List<AssessmentQuestion__c> getAvailableQuestions() {
         log('getAvailableQuestions', 'Method started', '');
         
         try {
-            // Only get questions that don't have a parent (HasRelatedQuestion__c = false or null)
+            // Get questions that:
+            // 1. HasRelatedQuestion__c = false or null (no related questions)
+            // 2. HasRelatedQuestion__c = true but RelatedQuestionId__c and RelatedCriteria__c are null
             List<AssessmentQuestion__c> questions = [
                 SELECT Id, Name, Question__c, Type__c, IsActive__c, 
-                       HasRelatedQuestion__c, RelatedQuestionId__c
+                       HasRelatedQuestion__c, RelatedQuestionId__c, RelatedCriteria__c
                 FROM AssessmentQuestion__c 
                 WHERE IsActive__c = true 
-                AND (HasRelatedQuestion__c = false OR HasRelatedQuestion__c = null)
+                AND (
+                    HasRelatedQuestion__c = false 
+                    OR HasRelatedQuestion__c = null
+                    OR (HasRelatedQuestion__c = true 
+                        AND RelatedQuestionId__c = null 
+                        AND RelatedCriteria__c = null)
+                )
                 ORDER BY CreatedDate DESC
                 LIMIT 500
             ];
